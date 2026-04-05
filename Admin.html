@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin</title>
+  <!-- No branding in title — keeps URL purpose obscure -->
+  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --yellow:#FFD93D; --coral:#FF6B6B; --teal:#4ECDC4;
+      --navy:#1A1A2E;   --navy2:#16213E; --green:#06D6A0;
+      --purple:#7C3AED; --white:#FFFFFF;
+      --font-display:'Boogaloo',cursive;
+      --font-body:'Nunito',sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:var(--font-body);background:var(--navy);color:var(--white);min-height:100vh;}
+
+    /* ── PIN Gate (shown first, hides everything else) ── */
+    #pin-gate {
+      position:fixed;inset:0;background:var(--navy);
+      display:flex;align-items:center;justify-content:center;
+      z-index:9999;
+    }
+    .pin-card {
+      background:rgba(255,255,255,0.05);
+      border:2px solid rgba(255,255,255,0.12);
+      border-radius:24px;padding:2.5rem 3rem;
+      max-width:380px;width:90%;text-align:center;
+    }
+    .pin-icon{font-size:3rem;margin-bottom:0.5rem;}
+    .pin-title{font-family:var(--font-display);font-size:1.8rem;color:var(--yellow);letter-spacing:1px;margin-bottom:0.3rem;}
+    .pin-sub{font-size:0.85rem;color:rgba(255,255,255,0.4);margin-bottom:1.5rem;}
+    #pin-input{
+      width:100%;background:rgba(255,255,255,0.08);
+      border:2px solid rgba(255,255,255,0.2);border-radius:12px;
+      padding:0.85rem 1rem;font-family:var(--font-body);font-size:1.2rem;
+      color:#fff;text-align:center;outline:none;letter-spacing:4px;
+      margin-bottom:0.5rem;transition:border-color 0.2s;
+    }
+    #pin-input:focus{border-color:var(--teal);}
+    #pin-error{display:none;color:var(--coral);font-size:0.82rem;font-weight:700;margin-bottom:0.75rem;}
+    #pin-submit{
+      width:100%;background:linear-gradient(135deg,var(--yellow),var(--coral));
+      border:none;border-radius:12px;padding:0.9rem;
+      font-family:var(--font-display);font-size:1.2rem;letter-spacing:1px;
+      color:var(--navy);cursor:pointer;margin-top:0.5rem;
+      transition:transform 0.15s,box-shadow 0.15s;
+    }
+    #pin-submit:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,107,107,0.4);}
+    #attempts-left{font-size:0.75rem;color:rgba(255,255,255,0.3);margin-top:0.75rem;}
+
+    /* ── Main admin UI (hidden until PIN passed) ── */
+    #admin-ui{display:none;padding:2rem 1rem;}
+
+    .admin-header{text-align:center;margin-bottom:2rem;}
+    .admin-header h1{
+      font-family:var(--font-display);font-size:2.4rem;
+      color:var(--yellow);text-shadow:3px 3px 0 var(--coral);letter-spacing:2px;
+    }
+    .admin-header h1 span{color:var(--teal);}
+    .admin-badge{
+      display:inline-flex;align-items:center;gap:6px;
+      background:rgba(124,58,237,0.2);border:1px solid var(--purple);
+      border-radius:20px;padding:4px 14px;font-size:0.78rem;
+      font-weight:800;color:var(--purple);letter-spacing:1px;margin-top:0.4rem;
+    }
+
+    .tabs{display:flex;justify-content:center;gap:1rem;margin-bottom:1.5rem;}
+    .tab-btn{
+      font-family:var(--font-display);font-size:1.1rem;letter-spacing:1px;
+      padding:0.6rem 1.8rem;border-radius:30px;
+      border:2px solid rgba(255,255,255,0.15);
+      background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5);
+      cursor:pointer;transition:all 0.2s;
+    }
+    .tab-btn.active{background:rgba(255,217,61,0.15);border-color:var(--yellow);color:var(--yellow);}
+
+    .stats-bar{display:flex;justify-content:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+    .stat-chip{
+      background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+      border-radius:12px;padding:0.5rem 1.2rem;text-align:center;min-width:90px;
+    }
+    .stat-chip .num{font-family:var(--font-display);font-size:1.5rem;color:var(--teal);display:block;}
+    .stat-chip .lbl{font-size:0.68rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);}
+
+    .actions{display:flex;justify-content:center;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+    .action-btn{
+      padding:0.6rem 1.4rem;border-radius:12px;font-family:var(--font-body);
+      font-size:0.9rem;font-weight:800;letter-spacing:0.5px;cursor:pointer;
+      transition:all 0.15s;border:2px solid transparent;
+    }
+    .btn-export{background:linear-gradient(135deg,var(--teal),var(--purple));color:#fff;border:none;}
+    .btn-export:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(78,205,196,0.4);}
+    .btn-refresh{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);}
+    .btn-refresh:hover{background:rgba(255,255,255,0.12);}
+    .btn-clear{background:rgba(255,107,107,0.1);border-color:rgba(255,107,107,0.3);color:var(--coral);}
+    .btn-clear:hover{background:rgba(255,107,107,0.2);}
+
+    .lb-wrap{max-width:720px;margin:0 auto;}
+    .lb-table{width:100%;border-collapse:separate;border-spacing:0 5px;}
+    .lb-table thead th{
+      font-size:0.68rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+      color:rgba(255,255,255,0.3);padding:0 1rem 0.5rem;text-align:left;
+    }
+    .lb-table thead th.right{text-align:right;}
+    .lb-table thead th.center{text-align:center;}
+    .lb-row td{
+      background:rgba(255,255,255,0.04);padding:0.7rem 1rem;
+      font-weight:700;font-size:0.9rem;transition:background 0.15s;
+    }
+    .lb-row:hover td{background:rgba(255,255,255,0.08);}
+    .lb-row td:first-child{border-radius:10px 0 0 10px;}
+    .lb-row td:last-child{border-radius:0 10px 10px 0;}
+    .lb-row.gold   td{background:rgba(255,217,61,0.1);border-left:3px solid var(--yellow);}
+    .lb-row.silver td{background:rgba(192,192,192,0.07);border-left:3px solid #C0C0C0;}
+    .lb-row.bronze td{background:rgba(205,127,50,0.07);border-left:3px solid #CD7F32;}
+    .rank-cell{font-family:var(--font-display);font-size:1.1rem;width:44px;text-align:center;color:rgba(255,255,255,0.25);}
+    .gold   .rank-cell{color:var(--yellow);}
+    .silver .rank-cell{color:#C0C0C0;}
+    .bronze .rank-cell{color:#CD7F32;}
+    .score-cell{font-family:var(--font-display);font-size:1rem;color:var(--teal);text-align:center;}
+    .time-cell{color:rgba(255,255,255,0.4);font-size:0.82rem;text-align:center;}
+    .ts-cell{color:rgba(255,255,255,0.25);font-size:0.75rem;text-align:right;}
+
+    .placeholder{text-align:center;padding:3rem;color:rgba(255,255,255,0.25);}
+    .last-updated{text-align:center;margin-top:1.25rem;font-size:0.75rem;color:rgba(255,255,255,0.2);}
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;animation:blink 1.2s ease-in-out infinite;margin-right:4px;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+
+    ::-webkit-scrollbar{width:5px;height:5px;}
+    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px;}
+  </style>
+</head>
+<body>
+
+<!-- ── PIN GATE ── -->
+<div id="pin-gate">
+  <div class="pin-card">
+    <div class="pin-icon">🔐</div>
+    <h2 class="pin-title">ADMIN ACCESS</h2>
+    <p class="pin-sub">Enter your admin PIN to continue</p>
+    <input id="pin-input" type="password" maxlength="8" placeholder="••••"
+      onkeydown="if(event.key==='Enter')checkPin()"/>
+    <p id="pin-error">❌ Incorrect PIN</p>
+    <button id="pin-submit" onclick="checkPin()">Unlock →</button>
+    <p id="attempts-left"></p>
+  </div>
+</div>
+
+<!-- ── ADMIN UI (revealed after PIN) ── -->
+<div id="admin-ui">
+  <div class="admin-header">
+    <h1>🕵️ CYBER<span>CROSSWORD</span></h1>
+    <div class="admin-badge">🔒 ADMIN PANEL</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('main')">🔐 Main Event</button>
+    <button class="tab-btn" onclick="switchTab('demo')">🏢 Demo</button>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-chip"><span class="num" id="s-players">–</span><span class="lbl">Players</span></div>
+    <div class="stat-chip"><span class="num" id="s-completed">–</span><span class="lbl">Completed</span></div>
+    <div class="stat-chip"><span class="num" id="s-top">–</span><span class="lbl">Top Score</span></div>
+    <div class="stat-chip"><span class="num" id="s-avg">–</span><span class="lbl">Avg Time</span></div>
+  </div>
+
+  <div class="actions">
+    <button class="action-btn btn-export" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="action-btn btn-refresh" onclick="manualRefresh()">↻ Refresh</button>
+    <button class="action-btn btn-clear" onclick="confirmLogout()">🔒 Lock</button>
+  </div>
+
+  <div class="lb-wrap">
+    <table class="lb-table">
+      <thead>
+        <tr>
+          <th style="width:44px" class="center">#</th>
+          <th>Player</th>
+          <th class="center">Score</th>
+          <th class="center">Time</th>
+          <th class="right">Submitted</th>
+          <th class="center">Flag</th>
+        </tr>
+      </thead>
+      <tbody id="lb-body">
+        <tr><td colspan="5" class="placeholder">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="last-updated"><span class="dot"></span>Live · Last updated: <span id="refresh-time">–</span></div>
+</div>
+
+<script type="module">
+import { initializeApp }           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ── CONFIG ────────────────────────────────────────────────────
+// Change ADMIN_PIN before deploying. Use something only you know.
+const ADMIN_PIN   = '1337';
+const MAX_ATTEMPTS = 5;
+
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyCzGV6ZFIiYt4nR9zRltbSNRVgXs61mUwo",
+  authDomain:        "rakshaticrossword.firebaseapp.com",
+  databaseURL:       "https://rakshaticrossword-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "rakshaticrossword",
+  storageBucket:     "rakshaticrossword.firebasestorage.app",
+  messagingSenderId: "358152501423",
+  appId:             "1:358152501423:web:042896833ccf4066ad3c5a"
+};
+
+// ── PIN logic ─────────────────────────────────────────────────
+let attempts = 0;
+
+window.checkPin = function() {
+  const val = document.getElementById('pin-input').value.trim();
+  if (val === ADMIN_PIN) {
+    document.getElementById('pin-gate').style.display = 'none';
+    document.getElementById('admin-ui').style.display = 'block';
+    sessionStorage.setItem('admin_auth', '1');
+    initFirebase();
+  } else {
+    attempts++;
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-error').style.display = 'block';
+    const left = MAX_ATTEMPTS - attempts;
+    document.getElementById('attempts-left').textContent =
+      left > 0 ? `${left} attempt${left===1?'':'s'} remaining` : '';
+    if (attempts >= MAX_ATTEMPTS) {
+      document.getElementById('pin-input').disabled = true;
+      document.getElementById('pin-submit').disabled = true;
+      document.getElementById('pin-error').textContent = '🚫 Too many attempts. Refresh to try again.';
+    }
+  }
+};
+
+// Re-auth if returning in same session
+if (sessionStorage.getItem('admin_auth') === '1') {
+  document.getElementById('pin-gate').style.display = 'none';
+  document.getElementById('admin-ui').style.display = 'block';
+}
+
+window.confirmLogout = function() {
+  sessionStorage.removeItem('admin_auth');
+  location.reload();
+};
+
+// ── Firebase ──────────────────────────────────────────────────
+let db, currentTab = 'main', allData = { main: [], demo: [] }, unsubs = {};
+
+function initFirebase() {
+  const app = initializeApp(FIREBASE_CONFIG);
+  db = getDatabase(app);
+  subscribe('main');
+}
+
+function subscribe(tab) {
+  if (unsubs[tab]) return;
+  const path = tab === 'main' ? 'leaderboard' : 'demo-leaderboard';
+  unsubs[tab] = onValue(ref(db, path), snap => {
+    allData[tab] = processSnap(snap);
+    if (currentTab === tab) render(allData[tab]);
+  });
+}
+
+function processSnap(snap) {
+  if (!snap.exists()) return [];
+  return Object.entries(snap.val())
+    .map(([key, v]) => ({ key, ...v }))
+    .filter(e => e.name)
+    .sort((a, b) => b.score - a.score || (a.time||999999) - (b.time||999999));
+}
+
+// ── Render ────────────────────────────────────────────────────
+function fmt(s) {
+  if (s == null) return '–';
+  return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
+}
+
+function fmtTs(ts) {
+  if (!ts) return '–';
+  return new Date(ts).toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function render(entries) {
+  const tbody  = document.getElementById('lb-body');
+  const medals = ['🥇','🥈','🥉'];
+  const cls    = ['gold','silver','bronze'];
+
+  if (!entries.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="placeholder">No entries yet</td></tr>';
+    updateStats([]);
+    return;
+  }
+
+  tbody.innerHTML = entries.map((e, i) => `
+    <tr class="lb-row ${cls[i]||''}">
+      <td class="rank-cell">${medals[i]||(i+1)}</td>
+      <td>${esc(e.name)}</td>
+      <td class="score-cell">${e.score||0}</td>
+      <td class="time-cell">${fmt(e.time)}</td>
+      <td class="ts-cell">${fmtTs(e.timestamp)}</td><td style='text-align:center'>${e.flagged ? '⚠️' : ''}</td>
+    </tr>`).join('');
+
+  updateStats(entries);
+  document.getElementById('refresh-time').textContent = new Date().toLocaleTimeString();
+}
+
+function updateStats(e) {
+  const done = e.filter(x=>x.score>0).length;
+  document.getElementById('s-players').textContent   = e.length||'0';
+  document.getElementById('s-completed').textContent = done||'0';
+  document.getElementById('s-top').textContent       = e[0]?.score??'–';
+  document.getElementById('s-avg').textContent       = done
+    ? fmt(Math.round(e.reduce((s,x)=>s+(x.time||0),0)/done)) : '–';
+}
+
+// ── Tab switch ────────────────────────────────────────────────
+window.switchTab = function(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((b,i) =>
+    b.classList.toggle('active',(i===0&&tab==='main')||(i===1&&tab==='demo')));
+  render(allData[tab]);
+  subscribe(tab);
+};
+
+window.manualRefresh = function() {
+  render(allData[currentTab]);
+};
+
+// ── Export CSV ────────────────────────────────────────────────
+window.exportCSV = function() {
+  const entries = allData[currentTab];
+  if (!entries.length) { alert('No data to export.'); return; }
+  const header = 'Rank,Name,Score,Time,Submitted\n';
+  const rows   = entries.map((e,i) =>
+    `${i+1},"${(e.name||'').replace(/"/g,'""')}",${e.score||0},${fmt(e.time)},${fmtTs(e.timestamp)}`
+  ).join('\n');
+  const blob = new Blob([header+rows], {type:'text/csv'});
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `crossword-${currentTab}-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+};
+</script>
+</body>
+</html>
