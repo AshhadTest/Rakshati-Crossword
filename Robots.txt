@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /admin.html
+Disallow: /admin/
+Disallow: /leaderboard.html
+
+# Game files - no need to index these either
+Disallow: /game.js
+Disallow: /game-demo.js
+Disallow: /puzzle.js
+Disallow: /puzzle-demo.js
