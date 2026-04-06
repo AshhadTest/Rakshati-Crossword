@@ -180,8 +180,10 @@
     <table class="lb-table">
       <thead>
         <tr>
-          <th style="width:44px" class="center">#</th>
+          <th style="width:40px" class="center">#</th>
           <th>Player</th>
+          <th>Emp ID</th>
+          <th>BU</th>
           <th class="center">Score</th>
           <th class="center">Time</th>
           <th class="right">Submitted</th>
@@ -305,9 +307,12 @@ function render(entries) {
     <tr class="lb-row ${cls[i]||''}">
       <td class="rank-cell">${medals[i]||(i+1)}</td>
       <td>${esc(e.name)}</td>
+      <td style="font-size:0.78rem;color:rgba(255,255,255,0.5)">${esc(e.empId||'-')}</td>
+      <td style="font-size:0.75rem;color:var(--teal);opacity:0.8">${esc(e.bu||'-')}</td>
       <td class="score-cell">${e.score||0}</td>
       <td class="time-cell">${fmt(e.time)}</td>
-      <td class="ts-cell">${fmtTs(e.timestamp)}</td><td style='text-align:center'>${e.flagged ? '⚠️' : ''}</td>
+      <td class="ts-cell">${fmtTs(e.timestamp)}</td>
+      <td style='text-align:center'>${e.flagged ? '⚠️' : ''}</td>
     </tr>`).join('');
 
   updateStats(entries);
@@ -340,9 +345,9 @@ window.manualRefresh = function() {
 window.exportCSV = function() {
   const entries = allData[currentTab];
   if (!entries.length) { alert('No data to export.'); return; }
-  const header = 'Rank,Name,Score,Time,Submitted\n';
+  const header = 'Rank,Name,EmpID,BusinessUnit,Score,Time,Submitted\n';
   const rows   = entries.map((e,i) =>
-    `${i+1},"${(e.name||'').replace(/"/g,'""')}",${e.score||0},${fmt(e.time)},${fmtTs(e.timestamp)}`
+    `${i+1},"${(e.name||'').replace(/"/g,'""')}","${(e.empId||'').replace(/"/g,'""')}","${(e.bu||'').replace(/"/g,'""')}",${e.score||0},${fmt(e.time)},${fmtTs(e.timestamp)}`
   ).join('\n');
   const blob = new Blob([header+rows], {type:'text/csv'});
   const a    = document.createElement('a');
