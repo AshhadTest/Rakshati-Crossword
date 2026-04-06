@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Risk Crossword – Demo</title>
+  <title>Risk rossword – Demo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
@@ -45,13 +45,53 @@
     <div class="floating-icon" style="top:45%;left:90%;animation-delay:0.8s">🚨</div>
   </div>
   <div class="entry-card">
-    <div class="entry-logo">🏢</div>
+    <div class="entry-logo">🕵️</div>
     <h1 class="entry-title">Risk<span>CROSSWORD</span></h1>
     <p class="entry-subtitle">How well do you know your risk concepts?</p>
+
     <div class="entry-form">
-      <input type="text" id="player-name" placeholder="Enter your name…" maxlength="24" autocomplete="off"/>
+      <input type="text" id="player-name"   placeholder="Full Name *"        maxlength="30" autocomplete="off"/>
+      <input type="text" id="player-empid"  placeholder="Employee ID *"       maxlength="20" autocomplete="off"/>
+      <input type="text" id="player-bu"     placeholder="Business Unit (optional)" maxlength="30" autocomplete="off"/>
+      <div id="entry-error" class="entry-error" style="display:none"></div>
       <button id="start-btn" onclick="startGame()">LET'S GO! 🚀</button>
     </div>
+
+    <!-- Rules of the Game -->
+    <div class="rules-box">
+      <h3 class="rules-title">📋 How to Play</h3>
+
+      <div class="rules-section-label">🎯 What is this?</div>
+      <p class="rules-para">This is a cybersecurity crossword puzzle. Your goal is to fill in all the blank squares using the clues provided. Every answer is a cybersecurity term — no general knowledge needed beyond your security know-how!</p>
+
+      <div class="rules-section-label">🖱️ Filling in answers</div>
+      <ul class="rules-list">
+        <li><strong>Click any highlighted square</strong> to select it. The full word it belongs to will light up in teal.</li>
+        <li><strong>ACROSS words</strong> run left-to-right ➡️. <strong>DOWN words</strong> run top-to-bottom ⬇️. The clues panel on the right tells you which is which.</li>
+        <li>Just <strong>start typing</strong> — each letter fills the selected square and the cursor moves automatically to the next square in the word.</li>
+        <li><strong>Click the same square twice</strong> to switch between typing ACROSS or DOWN if the square belongs to two words.</li>
+        <li>Use <strong>arrow keys</strong> to move between squares, <strong>Backspace</strong> to erase, and <strong>Tab</strong> to jump to the next word.</li>
+        <li>You can also <strong>click any clue</strong> in the panel to jump straight to that word on the grid.</li>
+        <li>When you complete a word correctly, the squares <strong>turn green</strong> automatically — no submit button needed!</li>
+      </ul>
+
+      <div class="rules-section-label">⚡ Scoring — how points work</div>
+      <ul class="rules-list">
+        <li><strong>Base points:</strong> Every correct letter in a word earns you <strong>10 points</strong>. A 6-letter word = 60 pts, a 12-letter word = 120 pts.</li>
+        <li><strong>Time bonus:</strong> Each word also carries a bonus of up to <strong>300 points</strong>, which counts down by 1 point every second from the moment you start. Solve a word at the 1-minute mark and you get a 240-point bonus on top. Solve it after 5 minutes and the bonus is zero — but you still earn the base points.</li>
+        <li><strong>Example:</strong> Solve an 8-letter word at the 2-minute mark → 80 pts (base) + 180 pts (bonus) = <strong>260 pts</strong> for that word.</li>
+        <li><strong>Maximum possible score</strong> is around <strong>5,580 pts</strong> (if you could solve every word instantly). A realistic top score for a fast player is around <strong>4,000–4,500 pts</strong>.</li>
+      </ul>
+
+      <div class="rules-section-label">📌 Important rules</div>
+      <ul class="rules-list">
+        <li>⏱️ Your timer starts the moment you click <em>LET'S GO</em> — not when you type your first letter.</li>
+        <li>🔄 <strong>Switching browser tabs pauses your timer</strong> but flags your entry as suspicious. Three or more tab switches will mark you on the leaderboard.</li>
+        <li>🚫 <strong>One attempt per Employee ID.</strong> Once you start, you cannot restart under the same ID. Make it count!</li>
+        <li>🏆 Final rankings are determined by <strong>total score first</strong>, then by <strong>fastest completion time</strong> as a tiebreaker.</li>
+      </ul>
+    </div>
+
     <div id="live-count" class="live-count">👥 <span id="player-count">…</span> players online</div>
   </div>
 </div>
@@ -60,7 +100,7 @@
 <div id="game-screen" class="screen">
   <header class="game-header">
     <div class="header-left">
-      <span class="header-logo">🏢 OfficeCrossword</span>
+      <span class="header-logo">🕵️ CyberCrossword</span>
     </div>
     <div class="header-center">
       <div class="timer-box">
@@ -103,7 +143,7 @@
   <div class="complete-card">
     <div class="confetti-burst" id="confetti-burst"></div>
     <div class="complete-emoji">🎉</div>
-    <h2 class="complete-title">WELL DONE!</h2>
+    <h2 class="complete-title">PUZZLE COMPLETE!</h2>
     <div class="complete-stats">
       <div class="stat-box">
         <span class="stat-num" id="final-score">0</span>
@@ -127,7 +167,7 @@
   <div class="modal-card">
     <h2 class="modal-title">🏆 LEADERBOARD</h2>
     <div id="leaderboard-list" class="leaderboard-list"></div>
-    <a href="leaderboard.html?tab=demo" target="_blank" class="lb-full-link">&#x1F4CA; View full leaderboard</a>
+    <a href="leaderboard.html" target="_blank" class="lb-full-link">&#x1F4CA; View full leaderboard</a>
     <button class="modal-close-btn" onclick="hideLeaderboard()">Close</button>
   </div>
 </div>
@@ -135,6 +175,6 @@
 <!-- WORD CORRECT TOAST -->
 <div id="toast" class="toast"></div>
 
-<script type="module" src="game-demo.js"></script>
+<script type="module" src="game.js"></script>
 </body>
 </html>
