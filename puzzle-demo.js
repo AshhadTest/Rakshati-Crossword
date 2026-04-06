@@ -1,90 +1,94 @@
-// ============================================================
-//  PUZZLE DATA  – India-themed crossword  (DEMO)
-//  Grid: 7 rows × 9 cols
-//  All coordinates verified cell-by-cell.
-//
-//      0  1  2  3  4  5  6  7  8
-//   0 [.  .  .  I  N  D  I  R  A]   ← 1-INDIRA across
-//   1 [.  .  .  N  A  A  N  .  .]   ← 5-NAAN across
-//   2 [.  B  .  D  .  .  .  P  .]
-//   3 [L  O  T  U  S  .  T  A  J]   ← 8-LOTUS, 9-TAJ across
-//   4 [.  L  .  S  .  .  .  I  .]
-//   5 [.  L  .  .  .  A  S  S  I]   ← 10-ASSI across
-//   6 [A  Y  U  R  .  .  .  A  .]   ← 11-AYUR across
-//
-//   Down: 1-INDUS(c3), 6-BOLLY(c1), 7-PAISA(c7)
-// ============================================================
-
 export const PUZZLE = {
-  ROWS: 7,
-  COLS: 9,
+  ROWS: 23,
+  COLS: 15,
 
   words: [
     // ── ACROSS ──────────────────────────────────────────────
     {
-      number: 1,
+      number: 3,
       direction: 'across',
-      answer: 'SU5ESVJB',        // INDIRA
-      row: 0, col: 3,
-      clue: 'Female PM'
+      answer: 'Q1lCRVJBUks=',          // CYBERARK
+      row: 4, col: 2,
+      clue: 'PRIVAS developer'
     },
     {
       number: 5,
       direction: 'across',
-      answer: 'TkFBTg==',        // NAAN
-      row: 1, col: 3,
-      clue: 'A popular bread'
+      answer: 'Uk9PVEtJVA==',          // ROOTKIT
+      row: 7, col: 2,
+      clue: 'Stealthy malware designed to hide processes and gain persistence'
     },
     {
-      number: 8,
+      number: 7,
       direction: 'across',
-      answer: 'TE9UVVM=',        // LOTUS
-      row: 3, col: 0,
-      clue: 'National flower'
-    },
-    {
-      number: 9,
-      direction: 'across',
-      answer: 'VEFK',            // TAJ
-      row: 3, col: 6,
-      clue: 'Most touristy mahal'
-    },
-    {
-      number: 10,
-      direction: 'across',
-      answer: 'QVNTSQ==',        // ASSI
-      row: 5, col: 5,
-      clue: 'One of the rivers that combine to make Varanasi'
+      answer: 'QVBQU0VD',              // APPSEC
+      row: 10, col: 4,
+      clue: 'Application Security (for short)'
     },
     {
       number: 11,
       direction: 'across',
-      answer: 'QVlVUg==',        // AYUR
-      row: 6, col: 0,
-      clue: 'First part of a traditional Indian medical system'
+      answer: 'TUFURVJJQUxJVFk=',      // MATERIALITY
+      row: 12, col: 4,
+      clue: 'Threshold at which an issue becomes significant for reporting'
+    },
+    {
+      number: 13,
+      direction: 'across',
+      answer: 'UklTS0NVTFRVUkU=',      // RISKCULTURE
+      row: 19, col: 1,
+      clue: 'High priority risk concept in CBA these days'
     },
 
     // ── DOWN ─────────────────────────────────────────────────
     {
       number: 1,
       direction: 'down',
-      answer: 'SU5EVVM=',        // INDUS
-      row: 0, col: 3,
-      clue: 'Ancient river civilisation'
+      answer: 'SU5IRVJFTlQ=',          // INHERENT
+      row: 0, col: 8,
+      clue: 'Risk level before controls are applied'
+    },
+    {
+      number: 2,
+      direction: 'down',
+      answer: 'Q09ORklERU5USUFM',      // CONFIDENTIAL
+      row: 1, col: 11,
+      clue: 'Data classification level requiring restricted access'
+    },
+    {
+      number: 4,
+      direction: 'down',
+      answer: 'UklTS0FQUEVUSVRF',      // RISKAPPETITE
+      row: 4, col: 6,
+      clue: 'The amount of exposure an organisation is willing to accept'
     },
     {
       number: 6,
       direction: 'down',
-      answer: 'Qk9MTFk=',        // BOLLY
-      row: 2, col: 1,
-      clue: 'Short for Hindi movie industry'
+      answer: 'VEhSRUFUQUNUT1I=',      // THREATACTOR
+      row: 7, col: 13,
+      clue: 'Entity responsible for initiating malicious activity'
     },
     {
-      number: 7,
+      number: 8,
       direction: 'down',
-      answer: 'UEFJU0E=',        // PAISA
-      row: 2, col: 7,
-      clue: 'Smaller than a rupee, now endangered'
+      answer: 'U09F',                  // SOE
+      row: 10, col: 7,
+      clue: 'Standardised workstation image build used to enforce baseline controls'
+    },
+    {
+      number: 9,
+      direction: 'down',
+      answer: 'UkFOU09NV0FSRQ==',      // RANSOMWARE
+      row: 11, col: 1,
+      clue: 'Malware that encrypts data and demands payment for recovery'
+    },
+    {
+      number: 12,
+      direction: 'down',
+      answer: 'UkVNRURJQVRJT04=',      // REMEDIATION
+      row: 12, col: 8,
+      clue: 'Actions taken to fix vulnerabilities or control gaps'
     },
   ]
 };
