@@ -78,14 +78,16 @@
   <table class="lb-table">
     <thead>
       <tr>
-        <th style="width:48px" class="center">#</th>
+        <th style="width:44px" class="center">#</th>
         <th>Player</th>
+        <th>Emp ID</th>
+        <th>BU</th>
         <th class="center">Score</th>
         <th class="right">Time</th>
       </tr>
     </thead>
     <tbody id="lb-body">
-      <tr><td colspan="4" class="placeholder">Connecting to Firebase...</td></tr>
+      <tr><td colspan="6" class="placeholder">Connecting to Firebase...</td></tr>
     </tbody>
   </table>
 </div>
@@ -133,7 +135,7 @@ function render(entries) {
   const cls    = ['gold','silver','bronze'];
 
   if (!entries.length) {
-    tbody.innerHTML = '<tr><td colspan="4" class="placeholder">No scores yet &#x2014; be the first! &#x1F680;</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="placeholder">No scores yet &#x2014; be the first! &#x1F680;</td></tr>';
     updateStats([]);
     return;
   }
@@ -142,6 +144,8 @@ function render(entries) {
     <tr class="lb-row ${cls[i] || ''}">
       <td class="rank-cell">${medals[i] || (i+1)}</td>
       <td>${esc(e.name)}</td>
+      <td class="lb-empid">${esc(e.empId || '-')}</td>
+      <td class="lb-bu">${esc(e.bu || '-')}</td>
       <td class="score-cell">${e.score}</td>
       <td class="time-cell">${fmt(e.time)}</td>
     </tr>`).join('');
