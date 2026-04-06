@@ -31,10 +31,12 @@ html, body {
 /* ========== ENTRY SCREEN ========== */
 #entry-screen {
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;  /* allow scroll on tall content */
   background: var(--navy);
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 2rem 0;
 }
 
 #entry-screen::before {
@@ -65,12 +67,18 @@ html, body {
   backdrop-filter: blur(16px);
   border: 2px solid rgba(255,255,255,0.12);
   border-radius: 28px;
-  padding: 3rem 3.5rem;
+  padding: 2.5rem 3rem;
   text-align: center;
-  max-width: 440px;
-  width: 90%;
+  max-width: 960px;   /* wider card to hold two columns */
+  width: 92%;
   box-shadow: 0 24px 80px rgba(0,0,0,0.4);
   animation: cardPop 0.7s cubic-bezier(0.22,1,0.36,1) both;
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  grid-template-rows: auto;
+  gap: 0 2.5rem;
+  align-items: start;
+  text-align: left;
 }
 @keyframes cardPop {
   from { opacity:0; transform: scale(0.85) translateY(30px); }
@@ -561,7 +569,6 @@ html, body {
   .clues-section { min-width: 220px; }
   .header-logo { display: none; }
 
-  .entry-card { padding: 2rem 1.5rem; }
   .entry-title { font-size: 2.3rem; }
 }
 
@@ -625,7 +632,6 @@ html, body {
   color: var(--teal);
   opacity: 0.7;
 }
-
 /* ========== RULES BOX – verbose sections ========== */
 .rules-section-label {
   font-family: var(--font-display);
@@ -642,7 +648,27 @@ html, body {
   line-height: 1.5;
   margin-bottom: 0.4rem;
 }
-/* Make entry card wider to accommodate larger rules box */
-.entry-card {
-  max-width: 560px !important;
+
+/* ── Entry card two-column layout ── */
+.entry-logo     { grid-column: 1; text-align: center; }
+.entry-title    { grid-column: 1; text-align: center; }
+.entry-subtitle { grid-column: 1; text-align: center; }
+.entry-form     { grid-column: 1; }
+.live-count     { grid-column: 1; text-align: center; }
+.rules-box      { grid-column: 2; grid-row: 1 / 7; text-align: left; }
+
+/* ── Mobile: collapse to single column ── */
+@media (max-width: 780px) {
+  .entry-card {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+  .entry-logo, .entry-title, .entry-subtitle,
+  .entry-form, .live-count, .rules-box {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .rules-box { text-align: left; }
 }
