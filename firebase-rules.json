@@ -3,8 +3,15 @@
     "leaderboard": {
       ".read": true,
       "$entry": {
-        ".write": "!data.exists()",
-        ".validate": "newData.hasChildren(['name','score','time']) && newData.child('name').isString() && newData.child('name').val().length <= 30 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 99999 && newData.child('time').isNumber()"
+        ".write": "!data.exists() || data.child('empId').val() == newData.child('empId').val()",
+        ".validate": "newData.hasChildren(['name','empId','score','time']) && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 30 && newData.child('empId').isString() && newData.child('empId').val().length >= 1 && newData.child('empId').val().length <= 20 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 99999 && newData.child('time').isNumber() && newData.child('time').val() >= 0"
+      }
+    },
+    "demo-leaderboard": {
+      ".read": true,
+      "$entry": {
+        ".write": "!data.exists() || data.child('empId').val() == newData.child('empId').val()",
+        ".validate": "newData.hasChildren(['name','empId','score','time']) && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 30 && newData.child('empId').isString() && newData.child('empId').val().length >= 1 && newData.child('empId').val().length <= 20 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 99999 && newData.child('time').isNumber() && newData.child('time').val() >= 0"
       }
     }
   }
