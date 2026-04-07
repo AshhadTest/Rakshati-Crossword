@@ -85,6 +85,7 @@ html, body {
   to   { opacity:1; transform: scale(1) translateY(0); }
 }
 
+.company-logo { width: 140px; margin-bottom: 1rem; grid-column: 1; }
 .entry-logo { font-size: 4rem; margin-bottom: 0.5rem; animation: wiggle 2s ease-in-out infinite; }
 @keyframes wiggle {
   0%,100% { transform: rotate(-5deg); }
