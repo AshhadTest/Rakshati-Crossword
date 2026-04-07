@@ -25,6 +25,8 @@ const db  = getDatabase(app);
 
 // ── State ────────────────────────────────────────────────────
 let playerName   = '';
+let playerEmpId  = '';
+let playerBU     = '';
 let playerKey    = null;     // Firebase push key for this player
 let grid         = [];       // 2-D array of cell objects
 let selectedCell = null;     // {row, col}
@@ -455,6 +457,8 @@ async function submitScore(elapsed) {
   try {
     const payload = {
       name:      playerName,
+      empId:     playerEmpId,
+      bu:        playerBU,
       score:     score,
       time:      elapsed,
       timestamp: serverTimestamp(),
@@ -506,7 +510,11 @@ function loadLeaderboard() {
       div.className = 'lb-entry' + (e.key === playerKey ? ' me' : '');
       div.innerHTML = `
         <span class="lb-rank">${medals[i] || (i+1)}</span>
-        <span class="lb-name">${escapeHtml(e.name)}${e.key === playerKey ? ' (you)' : ''}</span>
+        <span class="lb-name">
+          ${escapeHtml(e.name)}${e.key === playerKey ? ' (you)' : ''}
+          ${e.empId ? `<span class="lb-empid">[${escapeHtml(e.empId)}]</span>` : ''}
+          ${e.bu    ? `<span class="lb-bu">${escapeHtml(e.bu)}</span>` : ''}
+        </span>
         <span class="lb-score">${e.score}</span>
         <span class="lb-time">${formatTime(e.time || 0)}</span>
       `;
@@ -575,33 +583,7 @@ window.hideLeaderboard = function(e) {
 };
 
 // ── Entry / start ─────────────────────────────────────────────
-window.startGame = function() {
-  const nameInput = document.getElementById('player-name');
-  const name = nameInput.value.trim();
-  if (!name) {
-    nameInput.style.borderColor = 'var(--coral)';
-    nameInput.focus();
-    setTimeout(() => nameInput.style.borderColor = '', 1200);
-    return;
-  }
-  playerName = name;
 
-  // Register presence
-  const presRef = push(ref(db, 'demo-leaderboard'));
-  playerKey = presRef.key;
-
-  document.getElementById('entry-screen').classList.remove('active');
-  document.getElementById('game-screen').classList.add('active');
-
-  buildGrid();
-  renderGrid();
-  renderClues();
-  startTimer();
-
-  // Focus first cell
-  const firstWord = PUZZLE.words.find(w => w.direction === 'across');
-  if (firstWord) jumpToWord(firstWord);
-};
 
 // ── Init ──────────────────────────────────────────────────────
 document.getElementById('player-name').addEventListener('keydown', e => {
