@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Risk rossword – Demo</title>
+  <title>OfficeCrossword – Demo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
@@ -46,13 +46,13 @@
   </div>
   <div class="entry-card">
     <div class="entry-logo">🕵️</div>
-    <h1 class="entry-title">Risk<span>CROSSWORD</span></h1>
-    <p class="entry-subtitle">How well do you know your risk concepts?</p>
+    <h1 class="entry-title">CYBER<span>CROSSWORD</span></h1>
+    <p class="entry-subtitle">Test your cybersecurity knowledge!</p>
 
     <div class="entry-form">
-      <input type="text" id="player-name"   placeholder="Name *"        maxlength="30" autocomplete="off"/>
+      <input type="text" id="player-name"   placeholder="Full Name *"        maxlength="30" autocomplete="off"/>
       <input type="text" id="player-empid"  placeholder="Employee ID *"       maxlength="20" autocomplete="off"/>
-      <input type="text" id="player-bu"     placeholder="Business Unit" maxlength="30" autocomplete="off"/>
+      <input type="text" id="player-bu"     placeholder="Business Unit (optional)" maxlength="30" autocomplete="off"/>
       <div id="entry-error" class="entry-error" style="display:none"></div>
       <button id="start-btn" onclick="startGame()">LET'S GO! 🚀</button>
     </div>
@@ -100,7 +100,7 @@
 <div id="game-screen" class="screen">
   <header class="game-header">
     <div class="header-left">
-      <span class="header-logo">🕵️ CyberCrossword</span>
+      <span class="header-logo">🏢 OfficeCrossword</span>
     </div>
     <div class="header-center">
       <div class="timer-box">
@@ -143,7 +143,7 @@
   <div class="complete-card">
     <div class="confetti-burst" id="confetti-burst"></div>
     <div class="complete-emoji">🎉</div>
-    <h2 class="complete-title">PUZZLE COMPLETE!</h2>
+    <h2 class="complete-title">WELL DONE!</h2>
     <div class="complete-stats">
       <div class="stat-box">
         <span class="stat-num" id="final-score">0</span>
@@ -167,7 +167,7 @@
   <div class="modal-card">
     <h2 class="modal-title">🏆 LEADERBOARD</h2>
     <div id="leaderboard-list" class="leaderboard-list"></div>
-    <a href="leaderboard.html" target="_blank" class="lb-full-link">&#x1F4CA; View full leaderboard</a>
+    <a href="leaderboard.html?tab=demo" target="_blank" class="lb-full-link">&#x1F4CA; View full leaderboard</a>
     <button class="modal-close-btn" onclick="hideLeaderboard()">Close</button>
   </div>
 </div>
