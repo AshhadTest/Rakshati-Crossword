@@ -586,6 +586,83 @@ window.hideLeaderboard = function(e) {
 
 
 // ── Init ──────────────────────────────────────────────────────
+
+// ── Entry / start ─────────────────────────────────────────────
+window.startGame = async function() {
+  const nameInput  = document.getElementById('player-name');
+  const empInput   = document.getElementById('player-empid');
+  const buInput    = document.getElementById('player-bu');
+  const errBox     = document.getElementById('entry-error');
+  const startBtn   = document.getElementById('start-btn');
+
+  const name  = nameInput.value.trim();
+  const empId = empInput.value.trim().toUpperCase();
+  const bu    = buInput.value.trim();
+
+  errBox.style.display = 'none';
+
+  if (!name) {
+    nameInput.style.borderColor = 'var(--coral)';
+    nameInput.focus();
+    setTimeout(() => nameInput.style.borderColor = '', 1200);
+    return;
+  }
+  if (!empId) {
+    empInput.style.borderColor = 'var(--coral)';
+    empInput.focus();
+    setTimeout(() => empInput.style.borderColor = '', 1200);
+    return;
+  }
+
+  // Check for duplicate EmpID in demo-leaderboard
+  startBtn.textContent = 'Checking…';
+  startBtn.disabled = true;
+
+  try {
+    const snap = await get(ref(db, 'demo-leaderboard'));
+    if (snap.exists()) {
+      const entries = Object.values(snap.val());
+      const already = entries.find(e => e.empId && e.empId.toUpperCase() === empId);
+      if (already) {
+        errBox.textContent = `❌ Employee ID ${empId} has already played. Only one attempt is allowed.`;
+        errBox.style.display = 'block';
+        startBtn.textContent = "LET'S GO! 🚀";
+        startBtn.disabled = false;
+        return;
+      }
+    }
+  } catch (err) {
+    console.warn('Duplicate check failed, proceeding:', err);
+  }
+
+  playerName  = name;
+  playerEmpId = empId;
+  playerBU    = bu;
+
+  // Transition to game immediately — never block on Firebase write
+  document.getElementById('entry-screen').classList.remove('active');
+  document.getElementById('game-screen').classList.add('active');
+
+  buildGrid();
+  renderGrid();
+  renderClues();
+  startTimer();
+
+  const firstWord = PUZZLE.words.find(w => w.direction === 'across');
+  if (firstWord) jumpToWord(firstWord);
+
+  // Register presence in background
+  try {
+    const presRef = push(ref(db, 'demo-leaderboard'));
+    playerKey = presRef.key;
+    set(ref(db, `demo-leaderboard/${playerKey}`), {
+      name: playerName, empId: playerEmpId, bu: playerBU, score: 0, time: 0
+    }).catch(err => console.warn('Presence write failed:', err));
+  } catch(err) {
+    console.warn('Could not register presence:', err);
+  }
+};
+
 document.getElementById('player-name').addEventListener('keydown', e => {
   if (e.key === 'Enter') window.startGame();
 });
