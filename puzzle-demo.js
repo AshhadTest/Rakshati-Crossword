@@ -39,7 +39,7 @@ export const PUZZLE = {
       direction: 'across',
       answer: 'Uk9PVEtJVA==',            // ROOTKIT
       row: 7, col: 2,
-      clue: 'Hides in your system like that one colleague who never responds but somehow attends every meeting'
+      clue: 'Is rooted in system like that one colleague who never responds but somehow attends every meeting'
     },
     {
       number: 6,
@@ -83,7 +83,7 @@ export const PUZZLE = {
       direction: 'down',
       answer: 'UklTS0FQUEVUSVRF',        // RISKAPPETITE
       row: 4, col: 6,
-      clue: 'The range between "jo hoga dekh lenge" and "jo ho raha wo dekha nahi jaa raha"'
+      clue: 'The range between "It will be fine" and "this is not fine"'
     },
     {
       number: 5,
