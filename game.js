@@ -7,7 +7,7 @@ import { PUZZLE } from './puzzle.js';
 
 // ── Firebase config ──────────────────────────────────────────
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, onValue, push, serverTimestamp, get }
+import { getDatabase, ref, set, onValue, push, serverTimestamp, get, remove, onDisconnect }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const FIREBASE_CONFIG = {
@@ -39,6 +39,7 @@ let solvedWords  = new Set();
 let totalCells   = 0;
 let filledCells  = 0;
 let gameComplete = false;
+let presenceRef  = null;     // Firebase ref for this player's presence entry
 
 // ── Decode answer at runtime (base64 → plaintext) ────────────
 function decode(b64) { return atob(b64); }
@@ -493,6 +494,7 @@ async function submitScore(elapsed) {
       time:      elapsed,
       timestamp: serverTimestamp(),
     };
+    if (tabSwitchCount >= 3) payload.flagged = true;
     if (playerKey) {
       await set(ref(db, `leaderboard/${playerKey}`), payload);
     } else {
@@ -502,11 +504,48 @@ async function submitScore(elapsed) {
   } catch (err) {
     console.warn('Firebase score submit failed:', err);
   }
+
+  // Clean up presence
+  try {
+    if (presenceRef) { remove(presenceRef).catch(() => {}); }
+  } catch(_) {}
 }
+
+// ── Firebase: submit feedback ─────────────────────────────────
+window.submitFeedback = async function() {
+  const input  = document.getElementById('feedback-input');
+  const btn    = document.getElementById('feedback-btn');
+  const msg    = document.getElementById('feedback-msg');
+  const text   = input.value.trim();
+  if (!text) return;
+
+  btn.disabled    = true;
+  btn.textContent = 'Sending…';
+  try {
+    await push(ref(db, 'feedback'), {
+      name:      playerName,
+      empId:     playerEmpId,
+      bu:        playerBU,
+      feedback:  text,
+      score:     score,
+      timestamp: serverTimestamp(),
+    });
+    msg.textContent   = '✅ Thanks for your feedback!';
+    msg.style.display = 'block';
+    input.disabled    = true;
+    btn.textContent   = 'Sent!';
+  } catch(err) {
+    msg.textContent   = '⚠️ Could not send — please try the email below.';
+    msg.style.display = 'block';
+    btn.textContent   = 'Send Feedback';
+    btn.disabled      = false;
+    console.warn('Feedback submit failed:', err);
+  }
+};
 
 // ── Firebase: player count ────────────────────────────────────
 function listenPlayerCount() {
-  onValue(ref(db, 'leaderboard'), (snap) => {
+  onValue(ref(db, 'presence'), (snap) => {
     const count = snap.exists() ? Object.keys(snap.val()).length : 0;
     document.getElementById('player-count').textContent = count;
   });
@@ -647,20 +686,28 @@ window.startGame = async function() {
   startBtn.disabled = true;
 
   try {
-    const snap = await get(ref(db, 'leaderboard'));
+    // Timeout wrapper — if Firebase hangs (e.g. after DB wipe), don't block forever
+    const snap = await Promise.race([
+      get(ref(db, 'leaderboard')),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 6000))
+    ]);
     if (snap.exists()) {
-      const entries = Object.values(snap.val());
-      const already = entries.find(e => e.empId && e.empId.toUpperCase() === empId);
-      if (already) {
-        errBox.textContent = `❌ Employee ID ${empId} has already played. Only one attempt is allowed.`;
-        errBox.style.display = 'block';
-        startBtn.textContent = "LET'S GO! 🚀";
-        startBtn.disabled = false;
-        return;
+      const val = snap.val();
+      // Guard: ensure val is an object before iterating
+      if (val && typeof val === 'object') {
+        const entries = Object.values(val);
+        const already = entries.find(e => e.empId && e.empId.toUpperCase() === empId);
+        if (already) {
+          errBox.textContent = `❌ Employee ID ${empId} has already played. Only one attempt is allowed.`;
+          errBox.style.display = 'block';
+          startBtn.textContent = "LET'S GO! 🚀";
+          startBtn.disabled = false;
+          return;
+        }
       }
     }
   } catch (err) {
-    console.warn('Duplicate check failed, proceeding:', err);
+    console.warn('Duplicate check skipped (timeout or error), proceeding:', err);
   }
 
   playerName  = name;
@@ -680,15 +727,21 @@ window.startGame = async function() {
   const firstWord = PUZZLE.words.find(w => w.direction === 'across');
   if (firstWord) jumpToWord(firstWord);
 
-  // Register presence in background (non-blocking)
+  // Reserve a key for this player (no Firebase write yet — that happens at submitScore)
   try {
     const presRef = push(ref(db, 'leaderboard'));
     playerKey = presRef.key;
-    set(ref(db, `leaderboard/${playerKey}`), {
-      name: playerName, empId: playerEmpId, bu: playerBU, score: 0, time: 0
-    }).catch(err => console.warn('Presence write failed:', err));
   } catch(err) {
-    console.warn('Could not register presence:', err);
+    console.warn('Could not reserve key:', err);
+  }
+
+  // Register live presence (auto-removed on disconnect/close)
+  try {
+    presenceRef = push(ref(db, 'presence'));
+    set(presenceRef, { name: playerName, t: Date.now() });
+    onDisconnect(presenceRef).remove();
+  } catch(err) {
+    console.warn('Presence write failed:', err);
   }
 };
 
@@ -706,12 +759,7 @@ document.addEventListener('visibilitychange', () => {
     pausedAt    = Date.now();
     clearInterval(timerInterval);
     tabSwitchCount++;
-    // Flag excessive tab switches on leaderboard
-    if (tabSwitchCount >= 3 && playerKey) {
-      import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js")
-        .then(({ ref: dbRef, set }) => set(dbRef(db, `leaderboard/${playerKey}/flagged`), true))
-        .catch(() => {});
-    }
+    // Flag is included in the score payload at game completion
   } else {
     // Player returned — resume timer
     if (timerPaused && pausedAt) {
