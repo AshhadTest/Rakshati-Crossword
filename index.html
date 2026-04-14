@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Rakshati Crossword – Can You Crack It?</title>
+  <title>CyberCrossword – Can You Crack It?</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
@@ -62,7 +62,7 @@
       <h3 class="rules-title">📋 How to Play</h3>
 
       <div class="rules-section-label">🎯 What is this?</div>
-      <p class="rules-para">This is a risk crossword puzzle. Your goal is to fill in all the blank squares using the clues provided. Every answer is a cybersecurity term — no general knowledge needed beyond your security know-how!</p>
+      <p class="rules-para">This is a cybersecurity crossword puzzle. Your goal is to fill in all the blank squares using the clues provided. Every answer is a cybersecurity term — no general knowledge needed beyond your security know-how!</p>
 
       <div class="rules-section-label">🖱️ Filling in answers</div>
       <ul class="rules-list">
@@ -159,6 +159,14 @@
       </div>
     </div>
     <button class="leaderboard-full-btn" onclick="showLeaderboard()">See Leaderboard 🏆</button>
+
+    <div class="feedback-section">
+      <p class="feedback-label">💬 How was the experience? Any suggestions?</p>
+      <textarea id="feedback-input" class="feedback-textarea" placeholder="Type your feedback here…" maxlength="500" rows="3"></textarea>
+      <button id="feedback-btn" class="feedback-submit-btn" onclick="submitFeedback()">Send Feedback</button>
+      <div id="feedback-msg" class="feedback-msg" style="display:none"></div>
+      <p class="feedback-contact">For questions or concerns, reach out to <strong>&lt;email@example.com&gt;</strong></p>
+    </div>
   </div>
 </div>
 
