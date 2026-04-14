@@ -6,7 +6,7 @@
   <title>CyberCrossword – Can You Crack It?</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=2" />
 
   <!-- Security hardening -->
   <script>
@@ -183,6 +183,18 @@
 <!-- WORD CORRECT TOAST -->
 <div id="toast" class="toast"></div>
 
-<script type="module" src="game.js"></script>
+<script>
+  // Visible error handler — shows JS errors on screen since DevTools are blocked
+  window.onerror = function(msg, src, line) {
+    var e = document.getElementById('entry-error');
+    if (e) { e.textContent = '⚠️ JS Error: ' + msg + ' (line ' + line + ')'; e.style.display = 'block'; }
+  };
+  // Fallback if module fails to load — button click shows helpful message
+  window.startGame = window.startGame || function() {
+    var e = document.getElementById('entry-error');
+    if (e) { e.textContent = '⚠️ Game script failed to load. Try hard-refreshing (Ctrl+Shift+R).'; e.style.display = 'block'; }
+  };
+</script>
+<script type="module" src="game.js?v=2"></script>
 </body>
 </html>
