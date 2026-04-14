@@ -1,12 +1,6 @@
 // ============================================================
 //  PUZZLE DATA  – Cybersecurity crossword
-//  ALL coordinates verified cell-by-cell from Excel grid.
 //  Grid: 16 rows × 14 cols
-//
-//  Key: compound down words run continuously through intersections:
-//    2-down  CHANGECONTROL  col2  r0–r12  (13 letters)
-//    4-down  SYSTEMOUTAGE   col4  r4–r15  (12 letters)
-//    6-down  PHISHINGEMAIL  col13 r2–r14  (13 letters)
 // ============================================================
 
 export const PUZZLE = {
@@ -20,7 +14,7 @@ export const PUZZLE = {
       direction: 'across',
       answer: 'Q09OVFJPTA==',            // CONTROL
       row: 0, col: 2,
-      clue: 'The thing that was definitely in place before the incident, according to the report'
+      clue: 'A safeguard designed to prevent or detect issues──and prove that you tried'
     },
     {
       number: 3,
@@ -34,49 +28,49 @@ export const PUZZLE = {
       direction: 'across',
       answer: 'QVVESVQ=',                // AUDIT
       row: 2, col: 2,
-      clue: 'Annual visit where everyone suddenly discovers their documentation was "just updated"'
+      clue: 'Independent review that checks if you are doing what you said you were doing'
     },
     {
       number: 5,
       direction: 'across',
       answer: 'QkFDS1VQ',                // BACKUP
       row: 2, col: 8,
-      clue: 'Thing everyone has, nobody tests, and everyone desperately needs on a Friday afternoon'
+      clue: 'Kind of an old friend that you go back to when everything is lost'
     },
     {
       number: 9,
       direction: 'across',
       answer: 'QUNDRVNTUkVWSUVX',        // ACCESSREVIEW
       row: 6, col: 0,
-      clue: 'Quarterly ritual where managers approve everything without reading it'
+      clue: 'Process of verifying who should still have access──in theory, not just clicking approve'
     },
     {
       number: 11,
       direction: 'across',
       answer: 'VlBO',                    // VPN
       row: 8, col: 11,
-      clue: 'Makes you feel secure while working from a café with 47 other strangers on the same WiFi'
+      clue: 'Makes you connect securely to the office network, while working from a café with 47 other strangers on the same WiFi'
     },
     {
       number: 12,
       direction: 'across',
       answer: 'RExQ',                    // DLP
       row: 10, col: 9,
-      clue: 'Tool that blocks you from emailing your own presentation but somehow missed the actual breach'
+      clue: 'Tool that monitors and prevents sensitive data from leaving where it shouldn't'
     },
     {
       number: 15,
       direction: 'across',
       answer: 'TUZB',                    // MFA
       row: 12, col: 11,
-      clue: 'Second factor that your phone battery dies on at the worst possible moment'
+      clue: 'Authentication method requiring more than one proof of identity to log in '
     },
     {
       number: 16,
       direction: 'across',
       answer: 'QlJFQUNI',               // BREACH
       row: 15, col: 2,
-      clue: 'The word that ends careers, starts investigations, and triples the security budget overnight'
+      clue: 'Unauthorised access to systems or data──usually followed by a lot of meetings'
     },
 
     // ── DOWN ─────────────────────────────────────────────────
@@ -85,14 +79,14 @@ export const PUZZLE = {
       direction: 'down',
       answer: 'VEhJUkRQQVJUWVJJU0s=',   // THIRDPARTYRISK
       row: 0, col: 0,
-      clue: 'Your vendor\'s vendor\'s vendor\'s problem that somehow became your problem'
+      clue: 'Your vendor\'s vendor\'s vendor\'s security issue that somehow became your problem'
     },
     {
       number: 2,
       direction: 'down',
       answer: 'Q0hBTkdFQ09OVFJPTA==',   // CHANGECONTROL
       row: 0, col: 2,
-      clue: 'The process that was bypassed just this once because it was urgent, which caused the outage'
+      clue: 'Process to review and approve changes before they go-live──or at least before they go wrong'
     },
     {
       number: 3,
@@ -106,42 +100,42 @@ export const PUZZLE = {
       direction: 'down',
       answer: 'UEhJU0hJTkdFTUFJTA==',   // PHISHINGEMAIL
       row: 2, col: 13,
-      clue: 'Message that somehow still fools people despite 47 mandatory awareness trainings'
+      clue: 'Fake message designed to steal sensitive info──still surprisingly effective'
     },
     {
       number: 7,
       direction: 'down',
       answer: 'U1lTVEVNT1VUQUdF',       // SYSTEMOUTAGE
       row: 4, col: 4,
-      clue: 'Scheduled for 2am Sunday, actually happens 2pm Thursday during the board presentation'
+      clue: 'Systems become unavailable──usually at the worst possible time'
     },
     {
       number: 8,
       direction: 'down',
       answer: 'VEhSRUFU',               // THREAT
       row: 4, col: 6,
-      clue: 'Anything your CISO uses to justify next year\'s budget request'
+      clue: 'Anything capable of exploiting a weakness and causing harm──technical or human'
     },
     {
       number: 10,
       direction: 'down',
       answer: 'SU5DSURFTlQ=',           // INCIDENT
       row: 6, col: 9,
-      clue: 'An "issue" until legal gets involved, at which point it becomes one of these'
+      clue: 'A security event that causes or could cause harm──depending on how bad your day is'
     },
     {
       number: 13,
       direction: 'down',
       answer: 'UEFN',                   // PAM
       row: 10, col: 11,
-      clue: 'Keeps the keys to the kingdom — and the admin who manages it has a very stressful job'
+      clue: 'System that controls privileged access'
     },
     {
       number: 14,
       direction: 'down',
       answer: 'UEFUQ0g=',               // PATCH
       row: 11, col: 7,
-      clue: 'Fix that was available six months before the breach that nobody had time to apply'
+      clue: 'Security update that fixes vulnerabilities──ideally before attackers find them'
     },
   ]
 };
