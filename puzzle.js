@@ -56,7 +56,7 @@ export const PUZZLE = {
       direction: 'across',
       answer: 'RExQ',                    // DLP
       row: 10, col: 9,
-      clue: 'Tool that monitors and prevents sensitive data from leaving where it shouldn't'
+      clue: 'Tool that monitors and prevents sensitive data from leaving where it should not'
     },
     {
       number: 15,
