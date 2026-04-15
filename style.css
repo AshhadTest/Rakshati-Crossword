@@ -316,7 +316,7 @@ html, body {
 
 /* ========== CLUES PANEL ========== */
 .clues-panel {
-  width: 480px;
+  width: 550px;
   flex-shrink: 0;
   background: rgba(255,255,255,0.03);
   border-left: 2px solid rgba(255,255,255,0.07);
