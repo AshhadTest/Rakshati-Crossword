@@ -39,7 +39,6 @@ let solvedWords  = new Set();
 let totalCells   = 0;
 let filledCells  = 0;
 let gameComplete = false;
-let presenceRef  = null;     // Firebase ref for this player's presence entry
 
 // ── Decode answer at runtime (base64 → plaintext) ────────────
 function decode(b64) { return atob(b64); }
@@ -504,42 +503,33 @@ async function submitScore(elapsed) {
   } catch (err) {
     console.warn('Firebase score submit failed:', err);
   }
-
-  // Clean up presence
-  try {
-    if (presenceRef) { remove(presenceRef).catch(() => {}); }
-  } catch(_) {}
 }
 
 // ── Firebase: submit feedback ─────────────────────────────────
 window.submitFeedback = async function() {
-  const input  = document.getElementById('feedback-input');
-  const btn    = document.getElementById('feedback-btn');
-  const msg    = document.getElementById('feedback-msg');
-  const text   = input.value.trim();
+  const input = document.getElementById('feedback-input');
+  const btn   = document.getElementById('feedback-btn');
+  const msg   = document.getElementById('feedback-msg');
+  const text  = input.value.trim();
   if (!text) return;
 
-  btn.disabled    = true;
+  btn.disabled = true;
   btn.textContent = 'Sending…';
   try {
     await push(ref(db, 'feedback'), {
-      name:      playerName,
-      empId:     playerEmpId,
-      bu:        playerBU,
-      feedback:  text,
-      score:     score,
+      name: playerName, empId: playerEmpId,
+      feedback: text, score: score,
       timestamp: serverTimestamp(),
     });
-    msg.textContent   = '✅ Thanks for your feedback!';
+    msg.textContent = '✅ Thanks for your feedback!';
     msg.style.display = 'block';
-    input.disabled    = true;
-    btn.textContent   = 'Sent!';
+    input.disabled = true;
+    btn.textContent = 'Sent!';
   } catch(err) {
-    msg.textContent   = '⚠️ Could not send — please try the email below.';
+    msg.textContent = '⚠️ Could not send — please try the email below.';
     msg.style.display = 'block';
-    btn.textContent   = 'Send Feedback';
-    btn.disabled      = false;
-    console.warn('Feedback submit failed:', err);
+    btn.textContent = 'Send Feedback';
+    btn.disabled = false;
   }
 };
 
@@ -686,28 +676,20 @@ window.startGame = async function() {
   startBtn.disabled = true;
 
   try {
-    // Timeout wrapper — if Firebase hangs (e.g. after DB wipe), don't block forever
-    const snap = await Promise.race([
-      get(ref(db, 'leaderboard')),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 6000))
-    ]);
+    const snap = await get(ref(db, 'leaderboard'));
     if (snap.exists()) {
-      const val = snap.val();
-      // Guard: ensure val is an object before iterating
-      if (val && typeof val === 'object') {
-        const entries = Object.values(val);
-        const already = entries.find(e => e.empId && e.empId.toUpperCase() === empId);
-        if (already) {
-          errBox.textContent = `❌ Employee ID ${empId} has already played. Only one attempt is allowed.`;
-          errBox.style.display = 'block';
-          startBtn.textContent = "LET'S GO! 🚀";
-          startBtn.disabled = false;
-          return;
-        }
+      const entries = Object.values(snap.val());
+      const already = entries.find(e => e.empId && e.empId.toUpperCase() === empId);
+      if (already) {
+        errBox.textContent = `❌ Employee ID ${empId} has already played. Only one attempt is allowed.`;
+        errBox.style.display = 'block';
+        startBtn.textContent = "LET'S GO! 🚀";
+        startBtn.disabled = false;
+        return;
       }
     }
   } catch (err) {
-    console.warn('Duplicate check skipped (timeout or error), proceeding:', err);
+    console.warn('Duplicate check failed, proceeding:', err);
   }
 
   playerName  = name;
@@ -727,21 +709,18 @@ window.startGame = async function() {
   const firstWord = PUZZLE.words.find(w => w.direction === 'across');
   if (firstWord) jumpToWord(firstWord);
 
-  // Reserve a key for this player (no Firebase write yet — that happens at submitScore)
+  // Register presence in background (non-blocking)
   try {
+    // Reserve a leaderboard key (written at game completion only)
     const presRef = push(ref(db, 'leaderboard'));
     playerKey = presRef.key;
-  } catch(err) {
-    console.warn('Could not reserve key:', err);
-  }
 
-  // Register live presence (auto-removed on disconnect/close)
-  try {
-    presenceRef = push(ref(db, 'presence'));
-    set(presenceRef, { name: playerName, t: Date.now() });
-    onDisconnect(presenceRef).remove();
+    // Live presence — auto-removed when player disconnects
+    const liveRef = push(ref(db, 'presence'));
+    set(liveRef, { name: playerName, t: Date.now() });
+    onDisconnect(liveRef).remove();
   } catch(err) {
-    console.warn('Presence write failed:', err);
+    console.warn('Could not register presence:', err);
   }
 };
 
@@ -759,7 +738,7 @@ document.addEventListener('visibilitychange', () => {
     pausedAt    = Date.now();
     clearInterval(timerInterval);
     tabSwitchCount++;
-    // Flag is included in the score payload at game completion
+    // Flag is included in score payload at game completion
   } else {
     // Player returned — resume timer
     if (timerPaused && pausedAt) {
