@@ -675,10 +675,12 @@ window.startGame = async function() {
   startBtn.textContent = 'Checking…';
   startBtn.disabled = true;
 
+  let playerNumber = 1;
   try {
     const snap = await get(ref(db, 'leaderboard'));
     if (snap.exists()) {
       const entries = Object.values(snap.val());
+      playerNumber = entries.length + 1;
       const already = entries.find(e => e.empId && e.empId.toUpperCase() === empId);
       if (already) {
         errBox.textContent = `❌ Employee ID ${empId} has already played. Only one attempt is allowed.`;
@@ -699,6 +701,7 @@ window.startGame = async function() {
   // Transition to game immediately — don't block on Firebase write
   document.getElementById('entry-screen').classList.remove('active');
   document.getElementById('game-screen').classList.add('active');
+  document.getElementById('player-number').textContent = `You are player #${playerNumber}`;
 
   buildGrid();
   renderGrid();
