@@ -172,7 +172,13 @@ function preFillHints() {
   for (const word of PUZZLE.words) {
     if (word._answer.length < 10) continue;
 
-    for (const idx of HINT_INDICES) {
+    // For THIRDPARTYRISK (14 letters), also pre-fill the last letter
+    const indices = [...HINT_INDICES];
+    if (word._answer.length === 14 && word.direction === 'down' && word.col === 0) {
+      indices.push(word._answer.length - 1);
+    }
+
+    for (const idx of indices) {
       if (idx >= word._answer.length) continue;
 
       const r = word.direction === 'across' ? word.row       : word.row + idx;
@@ -333,6 +339,20 @@ function onKeyDown(e, r, c) {
   if (e.key === 'Tab') {
     e.preventDefault();
     cycleWord(e.shiftKey ? -1 : 1);
+    return;
+  }
+
+  // Handle letter keys directly for reliable cursor advancement
+  if (/^[a-zA-Z]$/.test(e.key)) {
+    e.preventDefault();
+    const cell = grid[r][c];
+    if (cell.inputEl.readOnly) return;
+    const letter = e.key.toUpperCase();
+    cell.inputEl.value = letter;
+    cell.value = letter;
+    cell.inputEl.classList.remove('correct-letter', 'wrong-letter');
+    checkAllWordsForCell(r, c);
+    advanceCursor(r, c);
   }
 }
 
