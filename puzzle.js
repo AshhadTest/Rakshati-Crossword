@@ -1,10 +1,10 @@
 // ============================================================
 //  PUZZLE DATA  – Cybersecurity crossword
-//  Grid: 16 rows × 14 cols
+//  Grid: 15 rows × 14 cols
 // ============================================================
 
 export const PUZZLE = {
-  ROWS: 16,
+  ROWS: 15,
   COLS: 14,
 
   words: [
@@ -56,7 +56,7 @@ export const PUZZLE = {
       direction: 'across',
       answer: 'RExQ',                    // DLP
       row: 10, col: 9,
-      clue: 'Tool that monitors and prevents sensitive data from leaving where it should not'
+      clue: 'Tool that monitors and prevents sensitive data from leaving where it shouldn\'t'
     },
     {
       number: 15,
@@ -64,13 +64,6 @@ export const PUZZLE = {
       answer: 'TUZB',                    // MFA
       row: 12, col: 11,
       clue: 'Authentication method requiring more than one proof of identity to log in '
-    },
-    {
-      number: 16,
-      direction: 'across',
-      answer: 'QlJFQUNI',               // BREACH
-      row: 15, col: 2,
-      clue: 'Unauthorised access to systems or data──usually followed by a lot of meetings'
     },
 
     // ── DOWN ─────────────────────────────────────────────────
@@ -103,20 +96,6 @@ export const PUZZLE = {
       clue: 'Fake message designed to steal sensitive info──still surprisingly effective'
     },
     {
-      number: 7,
-      direction: 'down',
-      answer: 'U1lTVEVNT1VUQUdF',       // SYSTEMOUTAGE
-      row: 4, col: 4,
-      clue: 'Systems become unavailable──usually at the worst possible time'
-    },
-    {
-      number: 8,
-      direction: 'down',
-      answer: 'VEhSRUFU',               // THREAT
-      row: 4, col: 6,
-      clue: 'Anything capable of exploiting a weakness and causing harm──technical or human'
-    },
-    {
       number: 10,
       direction: 'down',
       answer: 'SU5DSURFTlQ=',           // INCIDENT
@@ -129,13 +108,6 @@ export const PUZZLE = {
       answer: 'UEFN',                   // PAM
       row: 10, col: 11,
       clue: 'System that controls privileged access'
-    },
-    {
-      number: 14,
-      direction: 'down',
-      answer: 'UEFUQ0g=',               // PATCH
-      row: 11, col: 7,
-      clue: 'Security update that fixes vulnerabilities──ideally before attackers find them'
     },
   ]
 };
