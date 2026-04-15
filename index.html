@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CyberCrossword – Can You Crack It?</title>
+  <title>Rakshati Crossword – Can You Crack It?</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="style.css" />
 
   <!-- Security hardening -->
   <script>
@@ -46,8 +46,8 @@
   </div>
   <div class="entry-card">
     <div class="entry-logo">🕵️</div>
-    <h1 class="entry-title">CYBER<span>CROSSWORD</span></h1>
-    <p class="entry-subtitle">Test your cybersecurity knowledge!</p>
+    <h1 class="entry-title">Rakshati<span>CROSSWORD</span></h1>
+    <p class="entry-subtitle">Test your risk knowledge!</p>
 
     <div class="entry-form">
       <input type="text" id="player-name"   placeholder="Full Name *"        maxlength="30" autocomplete="off"/>
@@ -62,7 +62,7 @@
       <h3 class="rules-title">📋 How to Play</h3>
 
       <div class="rules-section-label">🎯 What is this?</div>
-      <p class="rules-para">This is a cybersecurity crossword puzzle. Your goal is to fill in all the blank squares using the clues provided. Every answer is a cybersecurity term — no general knowledge needed beyond your security know-how!</p>
+      <p class="rules-para">This is a crossword puzzle to test your risk awareness in a playful way. Your goal is to fill in all the blank squares using the clues provided. Every answer is a risk term — no general knowledge needed beyond your day to day risk awareness!</p>
 
       <div class="rules-section-label">🖱️ Filling in answers</div>
       <ul class="rules-list">
@@ -80,7 +80,6 @@
         <li><strong>Base points:</strong> Every correct letter in a word earns you <strong>10 points</strong>. A 6-letter word = 60 pts, a 12-letter word = 120 pts.</li>
         <li><strong>Time bonus:</strong> Each word also carries a bonus of up to <strong>300 points</strong>, which counts down by 1 point every second from the moment you start. Solve a word at the 1-minute mark and you get a 240-point bonus on top. Solve it after 5 minutes and the bonus is zero — but you still earn the base points.</li>
         <li><strong>Example:</strong> Solve an 8-letter word at the 2-minute mark → 80 pts (base) + 180 pts (bonus) = <strong>260 pts</strong> for that word.</li>
-        <li><strong>Maximum possible score</strong> is around <strong>5,580 pts</strong> (if you could solve every word instantly). A realistic top score for a fast player is around <strong>4,000–4,500 pts</strong>.</li>
       </ul>
 
       <div class="rules-section-label">📌 Important rules</div>
@@ -101,6 +100,7 @@
   <header class="game-header">
     <div class="header-left">
       <span class="header-logo">🕵️ CyberCrossword</span>
+      <span id="player-number" class="player-number-badge"></span>
     </div>
     <div class="header-center">
       <div class="timer-box">
@@ -165,7 +165,6 @@
       <textarea id="feedback-input" class="feedback-textarea" placeholder="Type your feedback here…" maxlength="500" rows="3"></textarea>
       <button id="feedback-btn" class="feedback-submit-btn" onclick="submitFeedback()">Send Feedback</button>
       <div id="feedback-msg" class="feedback-msg" style="display:none"></div>
-      <p class="feedback-contact">For questions or concerns, reach out to <strong>&lt;syedashhadwahab.nabi@cba.com.au&gt;</strong></p>
     </div>
   </div>
 </div>
@@ -183,18 +182,6 @@
 <!-- WORD CORRECT TOAST -->
 <div id="toast" class="toast"></div>
 
-<script>
-  // Visible error handler — shows JS errors on screen since DevTools are blocked
-  window.onerror = function(msg, src, line) {
-    var e = document.getElementById('entry-error');
-    if (e) { e.textContent = '⚠️ JS Error: ' + msg + ' (line ' + line + ')'; e.style.display = 'block'; }
-  };
-  // Fallback if module fails to load — button click shows helpful message
-  window.startGame = window.startGame || function() {
-    var e = document.getElementById('entry-error');
-    if (e) { e.textContent = '⚠️ Game script failed to load. Try hard-refreshing (Ctrl+Shift+R).'; e.style.display = 'block'; }
-  };
-</script>
-<script type="module" src="game.js?v=2"></script>
+<script type="module" src="game.js"></script>
 </body>
 </html>
