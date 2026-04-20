@@ -82,7 +82,7 @@ export const PUZZLE = {
       direction: 'down',
       hash: '3c85978437cd002bf8cf381c88011e71a54f8e911c2482788bdabee415e551c1',
       length: 14,
-      hints: {2:'I', 8:'R', 13:'K'},
+      hints: {2:'I', 7:'R', 13:'K'},
       row: 0, col: 0,
       clue: 'Your vendor\'s security issue that somehow became your problem'
     },
