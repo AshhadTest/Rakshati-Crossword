@@ -549,6 +549,40 @@ function listenPlayerCount() {
   });
 }
 
+// ── Live stats banner ────────────────────────────────────────
+function listenBanner() {
+  onValue(ref(db, 'leaderboard'), (snap) => {
+    const banner = document.getElementById('live-banner');
+    if (!snap.exists()) { banner.style.display = 'none'; return; }
+
+    const entries = Object.values(snap.val()).filter(e => e.score > 0);
+    if (!entries.length) { banner.style.display = 'none'; return; }
+
+    // Top scorer
+    entries.sort((a, b) => b.score - a.score || (a.time||999999) - (b.time||999999));
+    const top = entries[0];
+    document.getElementById('banner-top-player').textContent = top.name || '–';
+    document.getElementById('banner-top-score').textContent = `(${top.score} pts)`;
+
+    // Top BU by total score
+    const buScores = {};
+    for (const e of entries) {
+      if (e.bu) buScores[e.bu] = (buScores[e.bu] || 0) + e.score;
+    }
+    const buEntries = Object.entries(buScores);
+    if (buEntries.length) {
+      buEntries.sort((a, b) => b[1] - a[1]);
+      document.getElementById('banner-top-bu').textContent = buEntries[0][0];
+      document.getElementById('banner-bu-score').textContent = `(${buEntries[0][1]} pts)`;
+    } else {
+      document.getElementById('banner-top-bu').textContent = '–';
+      document.getElementById('banner-bu-score').textContent = '';
+    }
+
+    banner.style.display = 'flex';
+  });
+}
+
 // ── Leaderboard ───────────────────────────────────────────────
 // Real-time leaderboard — onValue fires instantly whenever Firebase data changes
 let lbUnsubscribe = null;
@@ -770,3 +804,4 @@ document.getElementById('player-name').addEventListener('keydown', e => {
 });
 
 listenPlayerCount();
+listenBanner();
