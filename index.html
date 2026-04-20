@@ -1,187 +1,132 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Rakshati Crossword – Can You Crack It?</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+// ============================================================
+//  PUZZLE DATA  – Cybersecurity crossword
+//  Grid: 15 rows × 14 cols
+//  Answers stored as SHA-256 hashes — cannot be reversed
+// ============================================================
 
-  <!-- Security hardening -->
-  <script>
-    // Block right-click
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    // Block devtools shortcuts
-    document.addEventListener('keydown', e => {
-      if (e.key === 'F12') { e.preventDefault(); return false; }
-      if ((e.ctrlKey||e.metaKey) && e.shiftKey && ['I','J','C'].includes(e.key)) { e.preventDefault(); return false; }
-      if ((e.ctrlKey||e.metaKey) && e.key === 'u') { e.preventDefault(); return false; }
-    });
-    // Block iframe embedding
-    if (window.top !== window.self) { window.top.location = window.self.location; }
-    // Block drag
-    document.addEventListener('dragstart', e => e.preventDefault());
-    // DevTools size detection
-    (function(){
-      const t=160;
-      setInterval(()=>{
-        if(window.outerWidth-window.innerWidth>t||window.outerHeight-window.innerHeight>t){
-          document.body.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#1A1A2E;color:#FF6B6B;font-family:sans-serif;font-size:1.2rem;text-align:center;padding:2rem">🚫<br><br>Developer tools detected.<br><span style=\"font-size:0.9rem;opacity:0.6\">Please close DevTools to play.</span></div>';
-        }
-      },1200);
-    })();
-  </script>
-</head>
-<body>
+export const PUZZLE = {
+  ROWS: 15,
+  COLS: 14,
 
-<!-- ENTRY SCREEN -->
-<div id="entry-screen" class="screen active">
-  <div class="entry-bg">
-    <div class="floating-icon" style="top:8%;left:5%;animation-delay:0s">🔐</div>
-    <div class="floating-icon" style="top:15%;right:8%;animation-delay:0.5s">🛡️</div>
-    <div class="floating-icon" style="top:70%;left:3%;animation-delay:1s">🔑</div>
-    <div class="floating-icon" style="top:80%;right:5%;animation-delay:1.5s">💻</div>
-    <div class="floating-icon" style="top:45%;left:90%;animation-delay:0.8s">🚨</div>
-  </div>
-  <div class="entry-card">
-    <div class="entry-logo">🕵️</div>
-    <h1 class="entry-title">Rakshati<span>CROSSWORD</span></h1>
-    <p class="entry-subtitle">Test your risk knowledge!</p>
+  words: [
+    // ── ACROSS ──────────────────────────────────────────────
+    {
+      number: 2,
+      direction: 'across',
+      hash: '6fecf9081bd58fa5a91e8a1d8093dc89d0e2d87992138ca05ec4270060e69c2c',
+      length: 7,
+      row: 0, col: 2,
+      clue: 'A safeguard designed to prevent or detect issues──and prove that you tried'
+    },
+    {
+      number: 3,
+      direction: 'across',
+      hash: 'c97c29c7a71b392b437ee03fd17f09bb10b75e879466fc0eb757b2c4a78ac938',
+      length: 4,
+      row: 0, col: 10,
+      clue: 'Oil of the 21st Century'
+    },
+    {
+      number: 4,
+      direction: 'across',
+      hash: '7dd251bbda9c41bb364597d8a240e1824f62460234907abc4473e28ec3b95b69',
+      length: 5,
+      row: 2, col: 2,
+      clue: 'Independent review that checks if you are doing what you said you were doing'
+    },
+    {
+      number: 5,
+      direction: 'across',
+      hash: '4c2f023b97855c327e0829504d66d01075d31fc059358f4607331eb64815160d',
+      length: 6,
+      row: 2, col: 8,
+      clue: 'Copies of document for future use'
+    },
+    {
+      number: 9,
+      direction: 'across',
+      hash: '5f7aac6b60ebc6dd19e0a301fc35a9f1bd4697e470e5bf246d82084eed7f42fe',
+      length: 12,
+      hints: {2:'C', 8:'V'},
+      row: 6, col: 0,
+      clue: 'Process of verifying who should still have access──in theory, not just clicking approve'
+    },
+    {
+      number: 11,
+      direction: 'across',
+      hash: '2762a0671924e3e56ca5e1730e4990d920e6129e80b13540a21914ee0cd19eac',
+      length: 3,
+      row: 8, col: 11,
+      clue: 'Makes you connect securely to the office network, while working from a café'
+    },
+    {
+      number: 12,
+      direction: 'across',
+      hash: 'bc8bb362d36ab1f6b627c126d88205021420f35bb00c8033dab6e4e3709d255f',
+      length: 3,
+      row: 10, col: 9,
+      clue: 'Tool that monitors and prevents sensitive data from leaving where it shouldn\'t'
+    },
+    {
+      number: 15,
+      direction: 'across',
+      hash: 'd39ce05308e4ec6d55d3599061c99041fece213b56e0938125661670df668ff8',
+      length: 3,
+      row: 12, col: 11,
+      clue: 'Authentication method requiring more than one proof of identity to log in '
+    },
 
-    <div class="entry-form">
-      <input type="text" id="player-name"   placeholder="Full Name *"        maxlength="30" autocomplete="off"/>
-      <input type="text" id="player-empid"  placeholder="Employee ID *"       maxlength="20" autocomplete="off"/>
-      <input type="text" id="player-bu"     placeholder="Business Unit (optional)" maxlength="30" autocomplete="off"/>
-      <div id="entry-error" class="entry-error" style="display:none"></div>
-      <button id="start-btn" onclick="startGame()">LET'S GO! 🚀</button>
-    </div>
-
-    <!-- Rules of the Game -->
-    <div class="rules-box">
-      <h3 class="rules-title">📋 How to Play</h3>
-
-      <div class="rules-section-label">🎯 What is this?</div>
-      <p class="rules-para">This is a crossword puzzle to test your risk awareness in a playful way. Your goal is to fill in all the blank squares using the clues provided. Every answer is a risk term — no general knowledge needed beyond your day to day risk awareness!</p>
-
-      <div class="rules-section-label">🖱️ Filling in answers</div>
-      <ul class="rules-list">
-        <li><strong>Click any highlighted square</strong> to select it. The full word it belongs to will light up in teal.</li>
-        <li><strong>ACROSS words</strong> run left-to-right ➡️. <strong>DOWN words</strong> run top-to-bottom ⬇️. The clues panel on the right tells you which is which.</li>
-        <li>Just <strong>start typing</strong> — each letter fills the selected square and the cursor moves automatically to the next square in the word.</li>
-        <li><strong>Click the same square twice</strong> to switch between typing ACROSS or DOWN if the square belongs to two words.</li>
-        <li>Use <strong>arrow keys</strong> to move between squares, <strong>Backspace</strong> to erase, and <strong>Tab</strong> to jump to the next word.</li>
-        <li>You can also <strong>click any clue</strong> in the panel to jump straight to that word on the grid.</li>
-        <li>When you complete a word correctly, the squares <strong>turn green</strong> automatically — no submit button needed!</li>
-      </ul>
-
-      <div class="rules-section-label">⚡ Scoring — how points work</div>
-      <ul class="rules-list">
-        <li><strong>Base points:</strong> Every correct letter in a word earns you <strong>10 points</strong>. A 6-letter word = 60 pts, a 12-letter word = 120 pts.</li>
-        <li><strong>Time bonus:</strong> Each word also carries a bonus of up to <strong>300 points</strong>, which counts down by 1 point every second from the moment you start. Solve a word at the 1-minute mark and you get a 240-point bonus on top. Solve it after 5 minutes and the bonus is zero — but you still earn the base points.</li>
-        <li><strong>Example:</strong> Solve an 8-letter word at the 2-minute mark → 80 pts (base) + 180 pts (bonus) = <strong>260 pts</strong> for that word.</li>
-      </ul>
-
-      <div class="rules-section-label">📌 Important rules</div>
-      <ul class="rules-list">
-        <li>⏱️ Your timer starts the moment you click <em>LET'S GO</em> — not when you type your first letter.</li>
-        <li>🔄 <strong>Switching browser tabs pauses your timer</strong> but flags your entry as suspicious. Three or more tab switches will mark you on the leaderboard.</li>
-        <li>🚫 <strong>One attempt per Employee ID.</strong> Once you start, you cannot restart under the same ID. Make it count!</li>
-        <li>🏆 Final rankings are determined by <strong>total score first</strong>, then by <strong>fastest completion time</strong> as a tiebreaker.</li>
-      </ul>
-    </div>
-
-    <div id="live-count" class="live-count">👥 <span id="player-count">…</span> players online</div>
-  </div>
-</div>
-
-<!-- GAME SCREEN -->
-<div id="game-screen" class="screen">
-  <header class="game-header">
-    <div class="header-left">
-      <span class="header-logo">🕵️ CyberCrossword</span>
-      <span id="player-number" class="player-number-badge"></span>
-    </div>
-    <div class="header-center">
-      <div class="timer-box">
-        <span class="timer-label">TIME</span>
-        <span id="timer" class="timer-value">00:00</span>
-      </div>
-    </div>
-    <div class="header-right">
-      <div class="score-box">
-        <span class="score-label">SCORE</span>
-        <span id="score-display" class="score-value">0</span>
-      </div>
-      <button class="leaderboard-btn" onclick="showLeaderboard()">🏆</button>
-    </div>
-  </header>
-
-  <div class="game-body">
-    <div class="puzzle-panel">
-      <div id="crossword-grid" class="crossword-grid"></div>
-    </div>
-    <div class="clues-panel">
-      <div class="clues-section">
-        <h3 class="clues-heading across-heading">➡️ ACROSS</h3>
-        <ul id="across-clues" class="clues-list"></ul>
-      </div>
-      <div class="clues-section">
-        <h3 class="clues-heading down-heading">⬇️ DOWN</h3>
-        <ul id="down-clues" class="clues-list"></ul>
-      </div>
-    </div>
-  </div>
-
-  <div id="active-clue-bar" class="active-clue-bar">
-    <span id="active-clue-text">Click a cell to start!</span>
-  </div>
-</div>
-
-<!-- COMPLETE SCREEN -->
-<div id="complete-screen" class="screen">
-  <div class="complete-card">
-    <div class="confetti-burst" id="confetti-burst"></div>
-    <div class="complete-emoji">🎉</div>
-    <h2 class="complete-title">PUZZLE COMPLETE!</h2>
-    <div class="complete-stats">
-      <div class="stat-box">
-        <span class="stat-num" id="final-score">0</span>
-        <span class="stat-label">Points</span>
-      </div>
-      <div class="stat-box">
-        <span class="stat-num" id="final-time">0:00</span>
-        <span class="stat-label">Time</span>
-      </div>
-      <div class="stat-box">
-        <span class="stat-num" id="final-rank">#–</span>
-        <span class="stat-label">Rank</span>
-      </div>
-    </div>
-    <button class="leaderboard-full-btn" onclick="showLeaderboard()">See Leaderboard 🏆</button>
-
-    <div class="feedback-section">
-      <p class="feedback-label">💬 How was the experience? Any suggestions?</p>
-      <textarea id="feedback-input" class="feedback-textarea" placeholder="Type your feedback here…" maxlength="500" rows="3"></textarea>
-      <button id="feedback-btn" class="feedback-submit-btn" onclick="submitFeedback()">Send Feedback</button>
-      <div id="feedback-msg" class="feedback-msg" style="display:none"></div>
-    </div>
-  </div>
-</div>
-
-<!-- LEADERBOARD MODAL -->
-<div id="leaderboard-modal" class="modal-overlay" onclick="hideLeaderboard(event)">
-  <div class="modal-card">
-    <h2 class="modal-title">🏆 LEADERBOARD</h2>
-    <div id="leaderboard-list" class="leaderboard-list"></div>
-    <a href="leaderboard.html" target="_blank" class="lb-full-link">&#x1F4CA; View full leaderboard</a>
-    <button class="modal-close-btn" onclick="hideLeaderboard()">Close</button>
-  </div>
-</div>
-
-<!-- WORD CORRECT TOAST -->
-<div id="toast" class="toast"></div>
-
-<script type="module" src="game.js"></script>
-</body>
-</html>
+    // ── DOWN ─────────────────────────────────────────────────
+    {
+      number: 1,
+      direction: 'down',
+      hash: '3c85978437cd002bf8cf381c88011e71a54f8e911c2482788bdabee415e551c1',
+      length: 14,
+      hints: {2:'I', 7:'R', 13:'K'},
+      row: 0, col: 0,
+      clue: 'Your vendor\'s security issue that somehow became your problem'
+    },
+    {
+      number: 2,
+      direction: 'down',
+      hash: '1be982d3124058d369eaed4bf80b7f120028a6b6ab3f3ad43d078d3fa65682cc',
+      length: 13,
+      hints: {2:'A', 8:'T'},
+      row: 0, col: 2,
+      clue: 'Process to review and approve changes before they go-live──or at least before they go wrong'
+    },
+    {
+      number: 3,
+      direction: 'down',
+      hash: 'c9ff9d7d29e892ae070c1d1c994458bff733dfad5f006865c3c7065193f789db',
+      length: 3,
+      row: 0, col: 10,
+      clue: 'Paper or digital record of information, MS-Word created'
+    },
+    {
+      number: 6,
+      direction: 'down',
+      hash: 'ea994c18082214880814fafdfce2f93792ef60c8d8a4dadb1f524988a47558a6',
+      length: 13,
+      hints: {2:'I', 8:'M'},
+      row: 2, col: 13,
+      clue: 'Fake message designed to steal sensitive info──still surprisingly effective'
+    },
+    {
+      number: 10,
+      direction: 'down',
+      hash: '43f41584121a74725dce15273394855dbfd7bdc474f5932417ec9886ca733df0',
+      length: 8,
+      row: 6, col: 9,
+      clue: 'Undesired event disrupting normal operations'
+    },
+    {
+      number: 13,
+      direction: 'down',
+      hash: '14e140ffa1a767941932c8e3baaab6ba569bbafb36f1163a6e350b8193e5599c',
+      length: 3,
+      row: 10, col: 11,
+      clue: 'System that controls privileged access'
+    },
+  ]
+};
