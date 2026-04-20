@@ -40,14 +40,15 @@ let totalCells   = 0;
 let filledCells  = 0;
 let gameComplete = false;
 
-// ── Decode answer at runtime (base64 → plaintext) ────────────
-function decode(b64) { return atob(b64); }
+// ── SHA-256 hash for answer verification ─────────────────────
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const buf  = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
 
 // ── Build grid from puzzle data ──────────────────────────────
 function buildGrid() {
-  // Decode all answers once, stored in _answer so puzzle.js stays encoded
-  PUZZLE.words.forEach(w => { w._answer = decode(w.answer); });
-
   grid = Array.from({ length: PUZZLE.ROWS }, () =>
     Array.from({ length: PUZZLE.COLS }, () => ({
       answer: null,
@@ -60,17 +61,17 @@ function buildGrid() {
   );
 
   for (const word of PUZZLE.words) {
-    for (let i = 0; i < word._answer.length; i++) {
+    for (let i = 0; i < word.length; i++) {
       const r = word.direction === 'across' ? word.row : word.row + i;
       const c = word.direction === 'across' ? word.col + i : word.col;
       const cell = grid[r][c];
-      cell.answer = word._answer[i];
+      cell.answer = true;
       cell.words.push({ number: word.number, direction: word.direction });
       if (i === 0 && word.number) {
         cell.number = word.number;
       }
     }
-    totalCells += word._answer.length;
+    totalCells += word.length;
   }
   // de-dup totalCells (cells shared by across+down)
   let actual = 0;
@@ -165,33 +166,22 @@ function renderClues() {
 }
 
 
-// ── Pre-fill hint cells (3rd and 9th letter of 10+ char words) ──
+// ── Pre-fill hint cells from puzzle data ─────────────────────
 function preFillHints() {
-  const HINT_INDICES = [2, 8]; // 0-based: positions 3 and 9
-
   for (const word of PUZZLE.words) {
-    if (word._answer.length < 10) continue;
+    if (!word.hints) continue;
 
-    // For THIRDPARTYRISK (14 letters), also pre-fill the last letter
-    const indices = [...HINT_INDICES];
-    if (word._answer.length === 14 && word.direction === 'down' && word.col === 0) {
-      indices.push(word._answer.length - 1);
-    }
-
-    for (const idx of indices) {
-      if (idx >= word._answer.length) continue;
-
+    for (const [idxStr, letter] of Object.entries(word.hints)) {
+      const idx = parseInt(idxStr);
       const r = word.direction === 'across' ? word.row       : word.row + idx;
       const c = word.direction === 'across' ? word.col + idx : word.col;
       const cell = grid[r][c];
 
       if (!cell || !cell.inputEl) continue;
-
-      // Only pre-fill if not already filled by another hint
       if (cell.inputEl.value) continue;
 
-      cell.value          = word._answer[idx];
-      cell.inputEl.value  = word._answer[idx];
+      cell.value          = letter;
+      cell.inputEl.value  = letter;
       cell.inputEl.readOnly = true;
       cell.inputEl.classList.add('hint-letter');
       cell.el.classList.add('hint-cell');
@@ -252,7 +242,7 @@ function selectCell(r, c, dir) {
 
 function highlightWord(word) {
   if (!word) return;
-  for (let i = 0; i < word.answer.length; i++) {
+  for (let i = 0; i < word.length; i++) {
     const r = word.direction === 'across' ? word.row : word.row + i;
     const c = word.direction === 'across' ? word.col + i : word.col;
     grid[r][c].el.classList.add('highlighted');
@@ -382,7 +372,7 @@ function retreatCursor(r, c) {
 
 // Returns ordered list of [row,col] for a word
 function wordCells(word) {
-  return Array.from({length: word._answer.length}, (_, i) => [
+  return Array.from({length: word.length}, (_, i) => [
     word.direction === 'across' ? word.row       : word.row + i,
     word.direction === 'across' ? word.col + i   : word.col,
   ]);
@@ -406,35 +396,33 @@ function cycleWord(delta) {
 }
 
 // ── Word checking ─────────────────────────────────────────────
-function isWordCorrect(word) {
-  for (let i = 0; i < word._answer.length; i++) {
-    const r = word.direction === 'across' ? word.row : word.row + i;
-    const c = word.direction === 'across' ? word.col + i : word.col;
-    const cell = grid[r][c];
-    // Read value from input directly in case cell was pre-filled by crossing word
-    const val = cell.inputEl ? cell.inputEl.value : cell.value;
+async function isWordCorrect(word) {
+  const cells = wordCells(word);
+  let typed = '';
+  for (const [r, c] of cells) {
+    const val = grid[r][c].inputEl ? grid[r][c].inputEl.value : grid[r][c].value;
     if (!val) return false;
-    if (val !== word._answer[i]) return false;
+    typed += val;
   }
-  return true;
+  return (await sha256(typed)) === word.hash;
 }
 
-function checkAllWordsForCell(r, c) {
+async function checkAllWordsForCell(r, c) {
   // Find all words that include cell (r,c) and check each
   for (const word of PUZZLE.words) {
     if (solvedWords.has(`${word.direction}-${word.number}`)) continue;
     let inWord = false;
-    for (let i = 0; i < word._answer.length; i++) {
+    for (let i = 0; i < word.length; i++) {
       const wr = word.direction === 'across' ? word.row : word.row + i;
       const wc = word.direction === 'across' ? word.col + i : word.col;
       if (wr === r && wc === c) { inWord = true; break; }
     }
     if (!inWord) continue;
-    if (isWordCorrect(word)) {
+    if (await isWordCorrect(word)) {
       solvedWords.add(`${word.direction}-${word.number}`);
       markWordCorrect(word);
       awardPoints(word);
-      showToast(`✅ ${word._answer}!`);
+      showToast(`✅ Correct!`);
       const clueEl = document.getElementById(`clue-${word.direction}-${word.number}`);
       if (clueEl) clueEl.classList.add('solved-clue');
       checkPuzzleComplete();
@@ -451,7 +439,7 @@ function checkWordComplete() {
 }
 
 function markWordCorrect(word) {
-  for (let i = 0; i < word._answer.length; i++) {
+  for (let i = 0; i < word.length; i++) {
     const r = word.direction === 'across' ? word.row : word.row + i;
     const c = word.direction === 'across' ? word.col + i : word.col;
     const cell = grid[r][c];
@@ -470,7 +458,7 @@ function markWordCorrect(word) {
 }
 
 function awardPoints(word) {
-  const base   = word._answer.length * 10;
+  const base   = word.length * 10;
   const elapsed = (Date.now() - startTime) / 1000;
   const timeBonus = Math.max(0, Math.floor(300 - elapsed));
   score += base + timeBonus;
