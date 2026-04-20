@@ -91,7 +91,7 @@ export const PUZZLE = {
       direction: 'down',
       hash: '1be982d3124058d369eaed4bf80b7f120028a6b6ab3f3ad43d078d3fa65682cc',
       length: 13,
-      hints: {2:'A', 8:'T'},
+      hints: {2:'A', 9:'T'},
       row: 0, col: 2,
       clue: 'Process to review and approve changes before they go-live──or at least before they go wrong'
     },
@@ -108,7 +108,7 @@ export const PUZZLE = {
       direction: 'down',
       hash: 'ea994c18082214880814fafdfce2f93792ef60c8d8a4dadb1f524988a47558a6',
       length: 13,
-      hints: {2:'I', 8:'M'},
+      hints: {2:'I', 9:'M'},
       row: 2, col: 13,
       clue: 'Fake message designed to steal sensitive info──still surprisingly effective'
     },
