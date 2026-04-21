@@ -315,6 +315,7 @@ function onKeyDown(e, r, c) {
   if (e.key === 'Backspace') {
     e.preventDefault();
     const cell = grid[r][c];
+    if (cell.inputEl.readOnly) { retreatCursor(r, c); return; }
     if (cell.inputEl.value) {
       cell.inputEl.value = '';
       cell.value = '';
@@ -348,25 +349,33 @@ function onKeyDown(e, r, c) {
 
 function advanceCursor(r, c) {
   if (!activeWord) return;
-  // Move to next cell within the active word only
   const w = activeWord;
   const cells = wordCells(w);
-  const idx = cells.findIndex(([wr,wc]) => wr === r && wc === c);
-  if (idx !== -1 && idx + 1 < cells.length) {
-    const [nr, nc] = cells[idx + 1];
-    selectCell(nr, nc, direction);
+  let idx = cells.findIndex(([wr,wc]) => wr === r && wc === c);
+  // Skip forward past any readOnly hint cells
+  while (idx !== -1 && idx + 1 < cells.length) {
+    idx++;
+    const [nr, nc] = cells[idx];
+    if (!grid[nr][nc].inputEl.readOnly) {
+      selectCell(nr, nc, direction);
+      return;
+    }
   }
-  // At end of word — stay on last cell (don't jump to next word automatically)
+  // At end of word — stay on last cell
 }
 
 function retreatCursor(r, c) {
   if (!activeWord) return;
   const w = activeWord;
   const cells = wordCells(w);
-  const idx = cells.findIndex(([wr,wc]) => wr === r && wc === c);
-  if (idx > 0) {
-    const [nr, nc] = cells[idx - 1];
-    selectCell(nr, nc, direction);
+  let idx = cells.findIndex(([wr,wc]) => wr === r && wc === c);
+  while (idx > 0) {
+    idx--;
+    const [nr, nc] = cells[idx];
+    if (!grid[nr][nc].inputEl.readOnly) {
+      selectCell(nr, nc, direction);
+      return;
+    }
   }
 }
 
@@ -719,7 +728,10 @@ window.startGame = async function() {
 
   let playerNumber = 1;
   try {
-    const snap = await get(ref(db, 'leaderboard'));
+    const snap = await Promise.race([
+      get(ref(db, 'leaderboard')),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 6000))
+    ]);
     if (snap.exists()) {
       const entries = Object.values(snap.val());
       playerNumber = entries.length + 1;
