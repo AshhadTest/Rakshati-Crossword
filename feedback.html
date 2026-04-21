@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Feedback Export</title>
+  <meta name="robots" content="noindex, nofollow"/>
+  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--yellow:#FFD93D;--coral:#FF6B6B;--teal:#4ECDC4;--navy:#1A1A2E;--green:#06D6A0;--font-display:'Boogaloo',cursive;--font-body:'Nunito',sans-serif;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:var(--font-body);background:var(--navy);color:#fff;min-height:100vh;padding:2rem 1rem;}
+    .header{text-align:center;margin-bottom:2rem;}
+    .header h1{font-family:var(--font-display);font-size:2.2rem;color:var(--yellow);letter-spacing:2px;}
+    .header h1 span{color:var(--teal);}
+    .count{text-align:center;font-size:0.9rem;color:rgba(255,255,255,0.4);margin-bottom:1.5rem;}
+    .count strong{color:var(--teal);}
+    .actions{display:flex;justify-content:center;gap:0.75rem;margin-bottom:2rem;}
+    .btn{padding:0.7rem 1.6rem;border-radius:12px;font-family:var(--font-display);font-size:1rem;letter-spacing:1px;cursor:pointer;border:none;transition:transform 0.15s;}
+    .btn-export{background:linear-gradient(135deg,var(--teal),#7C3AED);color:#fff;}
+    .btn-export:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(78,205,196,0.4);}
+    .wrap{max-width:700px;margin:0 auto;}
+    .fb-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:1rem 1.2rem;margin-bottom:0.6rem;}
+    .fb-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;}
+    .fb-name{font-weight:800;font-size:0.9rem;color:var(--yellow);}
+    .fb-empid{font-size:0.75rem;color:rgba(255,255,255,0.35);}
+    .fb-score{font-family:var(--font-display);font-size:0.85rem;color:var(--teal);}
+    .fb-time{font-size:0.7rem;color:rgba(255,255,255,0.25);}
+    .fb-text{font-size:0.88rem;color:rgba(255,255,255,0.7);line-height:1.5;}
+    .placeholder{text-align:center;padding:3rem;color:rgba(255,255,255,0.25);}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>💬 CYBER<span>CROSSWORD</span> FEEDBACK</h1>
+  </div>
+  <div class="count" id="count">Loading…</div>
+  <div class="actions">
+    <button class="btn btn-export" onclick="exportCSV()">⬇ Export CSV</button>
+  </div>
+  <div class="wrap" id="list">
+    <div class="placeholder">Connecting to Firebase…</div>
+  </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const db = getDatabase(initializeApp({
+    apiKey:            "AIzaSyCzGV6ZFIiYt4nR9zRltbSNRVgXs61mUwo",
+    authDomain:        "rakshaticrossword.firebaseapp.com",
+    databaseURL:       "https://rakshaticrossword-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:         "rakshaticrossword",
+    storageBucket:     "rakshaticrossword.firebasestorage.app",
+    messagingSenderId: "358152501423",
+    appId:             "1:358152501423:web:042896833ccf4066ad3c5a"
+  }));
+
+  let feedbackData = [];
+
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const fmtTs = ts => ts ? new Date(ts).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '–';
+
+  onValue(ref(db, 'feedback'), snap => {
+    const list = document.getElementById('list');
+    const count = document.getElementById('count');
+
+    if (!snap.exists()) {
+      feedbackData = [];
+      list.innerHTML = '<div class="placeholder">No feedback yet</div>';
+      count.innerHTML = '<strong>0</strong> responses';
+      return;
+    }
+
+    feedbackData = Object.entries(snap.val())
+      .map(([k, v]) => ({ key: k, ...v }))
+      .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    count.innerHTML = `<strong>${feedbackData.length}</strong> response${feedbackData.length === 1 ? '' : 's'}`;
+
+    list.innerHTML = feedbackData.map(e => `
+      <div class="fb-card">
+        <div class="fb-meta">
+          <div><span class="fb-name">${esc(e.name || '–')}</span> <span class="fb-empid">${esc(e.empId || '')}</span></div>
+          <div><span class="fb-score">${e.score || 0} pts</span> · <span class="fb-time">${fmtTs(e.timestamp)}</span></div>
+        </div>
+        <div class="fb-text">${esc(e.feedback || '')}</div>
+      </div>
+    `).join('');
+  });
+
+  window.exportCSV = function() {
+    if (!feedbackData.length) { alert('No feedback to export.'); return; }
+    const header = 'Name,EmpID,Score,Feedback,Submitted\n';
+    const rows = feedbackData.map(e =>
+      `"${(e.name||'').replace(/"/g,'""')}","${(e.empId||'').replace(/"/g,'""')}",${e.score||0},"${(e.feedback||'').replace(/"/g,'""')}","${fmtTs(e.timestamp)}"`
+    ).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([header + rows], { type: 'text/csv' }));
+    a.download = `crossword-feedback-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+  };
+</script>
+</body>
+</html>
